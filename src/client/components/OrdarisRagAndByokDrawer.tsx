@@ -392,7 +392,14 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
               className="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 disabled:opacity-40 transition-colors flex items-center gap-1.5"
               title="Wipe all BYOK keys stored in this browser session"
             >
-              <Trash2 className="w-3.5 h-3.5" />
+              {wipingAll ? (
+                <span
+                  className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                  aria-hidden="true"
+                />
+              ) : (
+                <Trash2 className="w-3.5 h-3.5" />
+              )}
               {wipingAll ? 'Wiping...' : `Wipe Session Keys (${sessionVaultCount})`}
             </button>
             <button
@@ -572,11 +579,16 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                       type="button"
                       onClick={() => handleTestProvider(item.provider)}
                       disabled={isTesting || isSaving}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 disabled:opacity-40 flex items-center gap-1"
+                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 disabled:opacity-40 flex items-center gap-1.5"
                     >
-                      <RefreshCw
-                        className={`w-3 h-3 ${isTesting ? 'animate-spin' : ''}`}
-                      />
+                      {isTesting ? (
+                        <span
+                          className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <RefreshCw className="w-3 h-3" />
+                      )}
                       {isTesting ? 'Testing...' : 'Verify Connection'}
                     </button>
                     {item.source === 'vault' && (
@@ -655,9 +667,15 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                     type="button"
                     disabled={!inputVal.trim() || isSaving}
                     onClick={() => handleSaveKey(item.provider, inputVal)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors inline-flex items-center gap-1.5"
                   >
-                    {isSaving ? 'Encrypting...' : 'Save Session Key'}
+                    {isSaving && (
+                      <span
+                        className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                        aria-hidden="true"
+                      />
+                    )}
+                    <span>{isSaving ? 'Encrypting...' : 'Save Session Key'}</span>
                   </button>
                 </div>
               </div>
@@ -1159,8 +1177,15 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                         disabled={loadingDocId === doc.id}
                         className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 flex items-center gap-1.5"
                       >
-                        <Layers className="w-3.5 h-3.5 text-sky-400" />
-                        {loadingDocId === doc.id ? '...' : 'Inspect Chunks'}
+                        {loadingDocId === doc.id ? (
+                          <span
+                            className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <Layers className="w-3.5 h-3.5 text-sky-400" />
+                        )}
+                        {loadingDocId === doc.id ? 'Loading...' : 'Inspect Chunks'}
                       </button>
                       <button
                         type="button"
@@ -1291,9 +1316,17 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
               <button
                 type="submit"
                 disabled={uploading || !docTitle.trim() || !docContent.trim()}
-                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors"
+                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white disabled:opacity-40 transition-colors inline-flex items-center gap-1.5"
               >
-                {uploading ? 'Chunking & Indexing...' : 'Ingest & Chunk Document'}
+                {uploading && (
+                  <span
+                    className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                    aria-hidden="true"
+                  />
+                )}
+                <span>
+                  {uploading ? 'Chunking & Indexing...' : 'Ingest & Chunk Document'}
+                </span>
               </button>
             </div>
           </form>
@@ -1374,9 +1407,15 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
               type="button"
               onClick={() => void executeSearch()}
               disabled={searching}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-lg shadow-emerald-600/20"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-lg shadow-emerald-600/20 inline-flex items-center gap-2"
             >
-              {searching ? 'Searching...' : 'Search RAG'}
+              {searching && (
+                <span
+                  className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                  aria-hidden="true"
+                />
+              )}
+              <span>{searching ? 'Searching...' : 'Search RAG'}</span>
             </button>
           </div>
 

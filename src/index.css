@@ -30,8 +30,34 @@
   button,
   select,
   input,
-  textarea {
+  textarea,
+  a {
     transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  select:not(:disabled),
+  summary,
+  a[href],
+  label[for],
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled),
+  input[type="range"]:not(:disabled),
+  .ordaris-clickable {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  input:disabled,
+  textarea:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  button:not(:disabled):active {
+    transform: translateY(0.5px) scale(0.992);
   }
 
   button:focus-visible,
@@ -63,12 +89,107 @@
   }
 }
 
+@keyframes ordarisOrbitSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ordarisOrbitReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes ordarisShimmerBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(250%);
+  }
+}
+
 .animate-popup-slide-in {
   animation: ordarisPopupSlideIn 220ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .animate-popup-countdown {
   animation: ordarisPopupCountdown 6.5s linear forwards;
+}
+
+/* Simple & Fancy Dual-Ring Orbital Loading Spinner */
+.ordaris-fancy-spinner {
+  position: relative;
+  display: inline-block;
+  width: 0.95rem;
+  height: 0.95rem;
+  border-radius: 9999px;
+  border: 2px solid rgba(148, 163, 184, 0.22);
+  border-top-color: currentColor;
+  border-right-color: rgba(129, 140, 248, 0.85);
+  animation: ordarisOrbitSpin 680ms cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  flex-shrink: 0;
+  box-shadow: 0 0 10px -2px rgba(99, 102, 241, 0.45);
+}
+
+.ordaris-fancy-spinner::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 9999px;
+  border: 1.5px solid transparent;
+  border-bottom-color: rgba(52, 211, 153, 0.9);
+  animation: ordarisOrbitReverse 980ms linear infinite;
+}
+
+.ordaris-fancy-spinner-sm {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.ordaris-fancy-spinner-md {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.ordaris-fancy-spinner-lg {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-width: 2.5px;
+}
+
+.ordaris-fancy-spinner-lg::after {
+  inset: 3.5px;
+  border-width: 2px;
+}
+
+.ordaris-loading-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.ordaris-loading-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(129, 140, 248, 0.85),
+    rgba(52, 211, 153, 0.85),
+    transparent
+  );
+  animation: ordarisShimmerBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* Comfortable Mode Global Readability & Spacing Enhancements */

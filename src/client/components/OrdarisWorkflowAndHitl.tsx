@@ -811,7 +811,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     : 'bg-rose-950/80 hover:bg-rose-900/80 text-rose-200 border border-rose-500/40'
                 }`}
               >
-                <Play className="w-3.5 h-3.5" />
+                {executingWorkflow ? (
+                  <span
+                    className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Play className="w-3.5 h-3.5" />
+                )}
                 {executingWorkflow
                   ? 'Executing 6-Node DAG...'
                   : canExecuteWorkflow
@@ -943,7 +950,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 className="w-full py-2 px-3 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 text-xs font-semibold flex items-center justify-between transition-all"
               >
                 <span>1. Verify Production 6-Node Acyclic Graph</span>
-                <CheckCircle2 className="w-3.5 h-3.5" />
+                {validatingDag ? (
+                  <span
+                    className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                )}
               </button>
 
               <button
@@ -953,7 +967,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 className="w-full py-2 px-3 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-semibold flex items-center justify-between transition-all"
               >
                 <span>2. Inject Cycle (`agent-summary ➔ calc-risk`) & Test</span>
-                <AlertTriangle className="w-3.5 h-3.5" />
+                {validatingDag ? (
+                  <span
+                    className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                )}
               </button>
             </div>
 
@@ -1052,7 +1073,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 onClick={handleBatchApproveAll}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all"
               >
-                <Check className="w-3.5 h-3.5" />
+                {batchApproving ? (
+                  <span
+                    className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <Check className="w-3.5 h-3.5" />
+                )}
                 {batchApproving
                   ? 'Approving All...'
                   : `Approve All Pending (${pendingApprovals.length})`}
@@ -1243,7 +1271,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                             onClick={() => handleApprovalDecision(item.id, 'approved')}
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            {isDecidingThis ? (
+                              <span
+                                className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                            )}
                             {isDecidingThis
                               ? 'Submitting...'
                               : canDecideApproval
@@ -1257,7 +1292,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                             onClick={() => handleApprovalDecision(item.id, 'rejected')}
                             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-rose-600/90 hover:bg-rose-500 text-white text-xs font-bold transition-all"
                           >
-                            <XCircle className="w-3.5 h-3.5" />
+                            {isDecidingThis ? (
+                              <span
+                                className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                                aria-hidden="true"
+                              />
+                            ) : (
+                              <XCircle className="w-3.5 h-3.5" />
+                            )}
                             {isDecidingThis
                               ? 'Submitting...'
                               : canDecideApproval
