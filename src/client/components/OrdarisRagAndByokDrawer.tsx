@@ -511,32 +511,31 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
             return (
               <div
                 key={item.provider}
-                className={`p-4 rounded-xl border transition-all ${
+                className={`p-4 rounded-xl border border-l-4 transition-all ${
                   isSpotlighted
-                    ? 'bg-amber-950/20 border-amber-400 ring-2 ring-amber-500/40 shadow-lg'
+                    ? 'bg-amber-950/25 border-amber-400/70 border-l-amber-400 ring-2 ring-amber-500/40 shadow-lg'
                     : item.source === 'vault'
-                      ? 'bg-emerald-950/10 border-emerald-500/35'
+                      ? 'bg-[#0B111E] border-emerald-500/35 border-l-emerald-500'
                       : item.source === 'env'
-                        ? 'bg-sky-950/10 border-sky-500/35'
-                        : 'bg-zinc-900/50 border-zinc-800'
+                        ? 'bg-[#0B111E] border-sky-500/35 border-l-sky-500'
+                        : isAlwaysAvailableProvider
+                          ? 'bg-[#0B111E] border-slate-800 border-l-indigo-500'
+                          : 'bg-[#0B111E] border-slate-800 border-l-amber-500/70'
                 }`}
               >
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-xs font-bold text-white">
-                        {item.label}
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-800 text-zinc-300 border border-zinc-700">
+                <div className="space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-900 text-slate-300 border border-slate-700/80">
                         {item.modelName}
                       </span>
                       {isSpotlighted && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/25 text-amber-200 border border-amber-400/50">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/25 text-amber-200 border border-amber-400/50">
                           🔑 No Longer Free — Enter Key to Use {requiredEnginePrompt.engine}
                         </span>
                       )}
                       {item.source === 'vault' && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                           Tier 1: Session BYOK ({item.maskedPreview})
                           {item.ttlSecondsRemaining
                             ? ` • TTL ${Math.ceil(item.ttlSecondsRemaining / 60)}m`
@@ -544,24 +543,59 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                         </span>
                       )}
                       {item.source === 'env' && isAlwaysAvailableProvider && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-sky-500/15 text-sky-300 border border-sky-500/30">
                           Tier 2: Server .env ({item.maskedPreview})
                         </span>
                       )}
                       {item.source === 'none' && isAlwaysAvailableProvider && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
                           {item.provider === 'gemini'
                             ? 'Free • Always Available (Default Fallback)'
                             : 'Free • Always Available (Fallback: gemini-free)'}
                         </span>
                       )}
                       {item.source !== 'vault' && !isAlwaysAvailableProvider && (
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">
-                          No Longer Free — Requires {item.envVarName} in BYOK Vault to Use
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                          No Longer Free — Requires {item.envVarName} in BYOK Vault
                         </span>
                       )}
                     </div>
-                    <div className="text-[11px] text-zinc-400 font-mono mt-1 flex items-center gap-3">
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleTestProvider(item.provider)}
+                        disabled={isTesting || isSaving}
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 disabled:opacity-40 flex items-center gap-1.5"
+                      >
+                        {isTesting ? (
+                          <span
+                            className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <RefreshCw className="w-3 h-3" />
+                        )}
+                        {isTesting ? 'Testing...' : 'Verify Connection'}
+                      </button>
+                      {item.source === 'vault' && (
+                        <button
+                          type="button"
+                          onClick={() => handleSaveKey(item.provider, '')}
+                          disabled={isSaving}
+                          className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                        >
+                          Clear Key
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-bold text-white">
+                      {item.label}
+                    </span>
+                    <div className="text-[11px] text-slate-400 font-mono flex items-center gap-3">
                       <span>env: {item.envVarName}</span>
                       <a
                         href={item.docsUrl}
@@ -572,35 +606,6 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                         {isAlwaysAvailableProvider ? 'Get Free Key (Optional)' : 'Get Paid API Key (Required)'} <ExternalLink className="w-3 h-3" />
                       </a>
                     </div>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => handleTestProvider(item.provider)}
-                      disabled={isTesting || isSaving}
-                      className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 disabled:opacity-40 flex items-center gap-1.5"
-                    >
-                      {isTesting ? (
-                        <span
-                          className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <RefreshCw className="w-3 h-3" />
-                      )}
-                      {isTesting ? 'Testing...' : 'Verify Connection'}
-                    </button>
-                    {item.source === 'vault' && (
-                      <button
-                        type="button"
-                        onClick={() => handleSaveKey(item.provider, '')}
-                        disabled={isSaving}
-                        className="px-2 py-1 rounded-lg text-[11px] font-semibold bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30"
-                      >
-                        Clear Key
-                      </button>
-                    )}
                   </div>
                 </div>
 
@@ -1130,18 +1135,18 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
         {/* LEFT COLUMN: Knowledge Corpus + Drag-and-Drop Ingestion Studio (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Active Tenant Corpus List */}
-          <div className="bg-zinc-900/70 border border-zinc-800/90 rounded-2xl p-5 lg:p-6 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-xl">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800/80">
               <div>
-                <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
                   <Database className="w-4 h-4 text-emerald-400" />
                   <span>{activeOrgName} — RAG Corpus ({documents.length})</span>
                 </h3>
-                <p className="text-xs text-zinc-300 mt-1">
+                <p className="text-[11px] text-slate-400 mt-1">
                   Scoped to <code className="text-emerald-300 font-semibold">{activeOrgSlug}</code> via composite PostgreSQL FKs.
                 </p>
               </div>
-              <span className="px-2.5 py-1 rounded-lg text-xs font-mono bg-zinc-800 text-zinc-200 border border-zinc-700">
+              <span className="px-2.5 py-1 rounded-md text-[11px] font-mono bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                 64-d SHA-256 Vectors
               </span>
             </div>
@@ -1150,32 +1155,24 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-4 rounded-xl bg-zinc-950/85 border border-zinc-800/90 hover:border-zinc-700 transition-colors"
+                  className="p-3.5 rounded-xl bg-[#070B14] border border-slate-800/90 border-l-2 border-l-emerald-500/70 hover:border-slate-700 transition-colors space-y-2"
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-bold text-white truncate">
-                        {doc.title}
-                      </div>
-                      <div className="text-xs text-zinc-300 font-mono mt-1 flex flex-wrap items-center gap-2">
-                        <span>{doc.sourceFilename}</span>
-                        <span>•</span>
-                        <span className="text-emerald-400 font-semibold">
-                          {doc.chunkCount} chunk(s)
-                        </span>
-                        <span>•</span>
-                        <span>{doc.byteSize} B</span>
-                      </div>
-                      <div className="text-[11px] text-zinc-400 font-mono truncate mt-1">
-                        sha256: {doc.checksumSha256.slice(0, 20)}…
-                      </div>
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                    <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
+                      <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">
+                        {doc.sourceFilename}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
+                        {doc.chunkCount} chunk(s)
+                      </span>
+                      <span className="text-slate-400">{doc.byteSize} B</span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleInspectDocument(doc.id)}
                         disabled={loadingDocId === doc.id}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-100 border border-zinc-700 flex items-center gap-1.5"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900 hover:bg-slate-800 text-slate-100 border border-slate-700 flex items-center gap-1.5"
                       >
                         {loadingDocId === doc.id ? (
                           <span
@@ -1197,14 +1194,22 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                             : 'Delete document and cascade chunks'
                         }
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs sm:text-sm font-bold text-white truncate">
+                      {doc.title}
+                    </div>
+                    <div className="text-[10px] text-slate-400 font-mono shrink-0">
+                      sha256: {doc.checksumSha256.slice(0, 14)}…
                     </div>
                   </div>
                 </div>
               ))}
               {documents.length === 0 && (
-                <div className="text-sm text-zinc-400 py-8 text-center">
+                <div className="text-sm text-slate-400 py-8 text-center">
                   No documents indexed for this organization yet.
                 </div>
               )}
@@ -1214,11 +1219,11 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
           {/* Document Ingestion & Adversarial Injection Tester */}
           <form
             onSubmit={handleIngestDocument}
-            className="bg-zinc-900/70 border border-zinc-800/90 rounded-2xl p-5 lg:p-6 space-y-4 shadow-xl"
+            className="bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-indigo-500 rounded-xl p-5 space-y-4 shadow-xl"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-200 flex items-center gap-2">
-                <Upload className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <Upload className="w-3.5 h-3.5 text-indigo-400" />
                 <span>Ingest Runbook / Test Threat T-03</span>
               </h3>
               <div className="flex items-center gap-1.5">
@@ -1333,22 +1338,22 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
         </div>
 
         {/* RIGHT COLUMN: Hybrid FTS + Vector Search & 3-Part Score Breakdown (7 cols) */}
-        <div className="lg:col-span-7 bg-zinc-900/70 border border-zinc-800/90 rounded-2xl p-5 lg:p-6 flex flex-col space-y-5 shadow-xl">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="lg:col-span-7 bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-cyan-500 rounded-xl p-5 flex flex-col space-y-5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800/80">
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-wider text-zinc-100 flex items-center gap-2">
-                <Search className="w-4 h-4 text-emerald-400" />
+              <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+                <Search className="w-4 h-4 text-cyan-400" />
                 <span>Hybrid FTS + 64-d Vector Cosine Retrieval Inspector</span>
               </h3>
-              <p className="text-xs text-zinc-300 mt-1">
+              <p className="text-xs text-slate-300 mt-1">
                 Formula: <code className="text-emerald-300 font-semibold">0.45 × FTS + 0.40 × Lexical + 0.15 × VectorCosine</code>
               </p>
             </div>
 
             {/* Top-K & Retrieval Mode Controls */}
             <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-xl px-2.5 py-1.5">
-                <span className="text-xs text-zinc-400 font-mono">Mode:</span>
+              <div className="flex items-center gap-1.5 bg-[#070B14] border border-slate-800 rounded-xl px-2.5 py-1.5">
+                <span className="text-xs text-slate-400 font-mono">Mode:</span>
                 {(['hybrid', 'fts', 'vector'] as const).map((m) => (
                   <button
                     key={m}
@@ -1360,7 +1365,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold uppercase transition-colors ${
                       retrievalMode === m
                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'text-zinc-400 hover:text-zinc-200'
+                        : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {m}
@@ -1368,8 +1373,8 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                 ))}
               </div>
 
-              <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-xl px-2.5 py-1.5">
-                <span className="text-xs text-zinc-400 font-mono">Top-K:</span>
+              <div className="flex items-center gap-1.5 bg-[#070B14] border border-slate-800 rounded-xl px-2.5 py-1.5">
+                <span className="text-xs text-slate-400 font-mono">Top-K:</span>
                 {[1, 3, 5, 8].map((k) => (
                   <button
                     key={k}
@@ -1381,7 +1386,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     className={`px-2 py-1 rounded-lg text-xs font-mono ${
                       topK === k
                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'text-zinc-400 hover:text-zinc-200'
+                        : 'text-slate-400 hover:text-slate-200'
                     }`}
                   >
                     {k}
@@ -1401,7 +1406,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                 if (e.key === 'Enter') void executeSearch();
               }}
               placeholder="Enter hybrid search query..."
-              className="flex-1 px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-emerald-500/60"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#070B14] border border-slate-800 text-sm text-white focus:outline-none focus:border-emerald-500/60"
             />
             <button
               type="button"
@@ -1421,7 +1426,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
 
           {/* Preset Query Chips */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-zinc-400 font-mono">Presets:</span>
+            <span className="text-xs text-slate-400 font-mono">Presets:</span>
             {presetQueries.map((pq, idx) => (
               <button
                 key={idx}
@@ -1430,7 +1435,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                   setSearchQuery(pq);
                   void executeSearch(pq);
                 }}
-                className="px-2.5 py-1 rounded-lg text-xs bg-zinc-950 hover:bg-zinc-800 text-zinc-200 border border-zinc-800 truncate max-w-sm"
+                className="px-2.5 py-1 rounded-lg text-xs bg-[#070B14] hover:bg-slate-900 text-slate-200 border border-slate-800 truncate max-w-sm"
               >
                 {pq}
               </button>
@@ -1452,62 +1457,65 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
               return (
                 <div
                   key={chunk.chunkId}
-                  className={`p-4 lg:p-5 rounded-2xl border transition-all ${
+                  className={`p-4 lg:p-5 rounded-xl border border-l-4 transition-all ${
                     chunk.containsInjectionPattern
-                      ? 'bg-amber-950/15 border-amber-500/40'
-                      : 'bg-zinc-950/85 border-zinc-800'
+                      ? 'bg-amber-950/15 border-amber-500/40 border-l-amber-500'
+                      : 'bg-[#070B14] border-slate-800 border-l-emerald-500'
                   }`}
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2.5">
-                    <div className="flex items-center gap-2.5">
-                      <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                        #{idx + 1} • Score {(chunk.score ?? 0).toFixed(3)}
-                      </span>
-                      <span className="text-sm font-bold text-white">
-                        {chunk.documentTitle}
-                      </span>
-                      <span className="text-xs font-mono text-zinc-400">
-                        [chunk #{chunk.chunkIndex} • {chunk.tokenCount} tok]
-                      </span>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35">
+                          #{idx + 1} • Score {(chunk.score ?? 0).toFixed(3)}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-900 text-slate-300 border border-slate-800">
+                          chunk #{chunk.chunkIndex} • {chunk.tokenCount} tok
+                        </span>
+                        {chunk.containsInjectionPattern ? (
+                          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
+                            <ShieldAlert className="w-3.5 h-3.5" />
+                            Threat T-03 Quarantined
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            Clean Provenance
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setShowWrappedChunkId(
+                              isShowingWrapped ? null : chunk.chunkId
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700"
+                        >
+                          {isShowingWrapped
+                            ? 'Hide XML Envelope'
+                            : '<untrusted_context>'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onSendQueryToAgentStudio(
+                              `Search knowledge base for ${searchQuery} and summarize with verified citations.`
+                            )
+                          }
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 flex items-center gap-1"
+                        >
+                          <span>Run Agent With Context</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {chunk.containsInjectionPattern ? (
-                        <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
-                          <ShieldAlert className="w-3.5 h-3.5" />
-                          Threat T-03 Quarantined
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
-                          <ShieldCheck className="w-3.5 h-3.5" />
-                          Clean Provenance
-                        </span>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setShowWrappedChunkId(
-                            isShowingWrapped ? null : chunk.chunkId
-                          )
-                        }
-                        className="px-2.5 py-1 rounded-lg text-xs font-mono bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700"
-                      >
-                        {isShowingWrapped
-                          ? 'Hide XML Envelope'
-                          : '<untrusted_context>'}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          onSendQueryToAgentStudio(
-                            `Search knowledge base for ${searchQuery} and summarize with verified citations.`
-                          )
-                        }
-                        className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 flex items-center gap-1"
-                      >
-                        <span>Run Agent With Context</span>
-                        <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
+                    <div className="text-sm font-bold text-white">
+                      {chunk.documentTitle}
                     </div>
                   </div>
 

@@ -847,8 +847,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
       {/* SUB-TAB 4A: EVALUATIONS & REGRESSION GATE */}
       {subTab === 'evals' && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <Award className="w-5 h-5 text-indigo-400" />
@@ -942,21 +942,20 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               return (
                 <div
                   key={suite.id}
-                  className="rounded-xl border border-slate-800 bg-slate-950/80 p-4 space-y-4"
+                  className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#070B14] p-4 space-y-4"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div>
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-sm font-bold text-white">{suite.name}</h4>
-                        <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300">
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-900 text-slate-300 border border-slate-800">
                           {suite.caseCount} Golden Cases
                         </span>
                         {latest && (
                           <span
-                            className={`px-2 py-0.5 rounded text-[11px] font-mono font-bold border ${
+                            className={`px-2.5 py-0.5 rounded-md text-[11px] font-mono font-bold border ${
                               gatePassed
-                                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
-                                : 'bg-rose-500/15 text-rose-300 border-rose-500/30'
+                                ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35'
+                                : 'bg-rose-500/15 text-rose-300 border-rose-500/35'
                             }`}
                           >
                             {gatePassed
@@ -964,33 +963,32 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                               : `✗ RELEASE GATE BLOCKED (${passPct}% < ${slaThreshold}%)`}
                           </span>
                         )}
-                      </div>
-                      <div className="text-xs text-slate-400 mt-1 flex items-center gap-3">
-                        <span>Grader Assertions:</span>
                         <span className="font-mono text-[11px] text-indigo-300">
                           [tool_called] • [citation_required] • [contains]
                         </span>
                       </div>
+
+                      <button
+                        type="button"
+                        disabled={runningSuiteId === suite.id}
+                        onClick={() => handleRunEvalSuite(suite.id)}
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all"
+                      >
+                        {runningSuiteId === suite.id ? (
+                          <span
+                            className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <Play className="w-3.5 h-3.5" />
+                        )}
+                        {runningSuiteId === suite.id
+                          ? `Running on ${evalEngine}...`
+                          : `Run Benchmark Suite (${evalEngine})`}
+                      </button>
                     </div>
 
-                    <button
-                      type="button"
-                      disabled={runningSuiteId === suite.id}
-                      onClick={() => handleRunEvalSuite(suite.id)}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all"
-                    >
-                      {runningSuiteId === suite.id ? (
-                        <span
-                          className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
-                          aria-hidden="true"
-                        />
-                      ) : (
-                        <Play className="w-3.5 h-3.5" />
-                      )}
-                      {runningSuiteId === suite.id
-                        ? `Running on ${evalEngine}...`
-                        : `Run Benchmark Suite (${evalEngine})`}
-                    </button>
+                    <h4 className="text-sm font-bold text-white">{suite.name}</h4>
                   </div>
 
                   {latest?.caseResults && latest.caseResults.length > 0 && (
@@ -998,26 +996,33 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                       {latest.caseResults.map((c, idx) => (
                         <div
                           key={c.caseId || idx}
-                          className="rounded-lg border border-slate-800 bg-slate-900/70 p-3 flex flex-col justify-between gap-2"
+                          className={`rounded-xl border border-l-4 ${
+                            c.passed
+                              ? 'border-slate-800 border-l-emerald-500'
+                              : 'border-rose-500/40 border-l-rose-500'
+                          } bg-[#0B111E] p-3.5 flex flex-col justify-between gap-2.5`}
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <div className="text-xs font-bold text-white">
-                                Case #{idx + 1}: {c.name || c.prompt || `Golden Assertion Case ${idx + 1}`}
-                              </div>
-                              <div className="text-[11px] text-slate-400 mt-0.5 font-mono">
-                                {c.details || c.reason || 'Verified tool invocation, grounded citation quote, and domain keywords.'}
-                              </div>
+                          <div className="space-y-1.5">
+                            <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-800/80">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900 text-indigo-300 border border-slate-800">
+                                Golden Case #{idx + 1}
+                              </span>
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
+                                  c.passed
+                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                                    : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
+                                }`}
+                              >
+                                {c.passed ? 'PASS (100%)' : 'FAIL'}
+                              </span>
                             </div>
-                            <span
-                              className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold shrink-0 ${
-                                c.passed
-                                  ? 'bg-emerald-500/20 text-emerald-300'
-                                  : 'bg-rose-500/20 text-rose-300'
-                              }`}
-                            >
-                              {c.passed ? 'PASS (100%)' : 'FAIL'}
-                            </span>
+                            <div className="text-xs font-bold text-white">
+                              {c.name || c.prompt || `Golden Assertion Case ${idx + 1}`}
+                            </div>
+                            <div className="text-[11px] text-slate-400 font-mono">
+                              {c.details || c.reason || 'Verified tool invocation, grounded citation quote, and domain keywords.'}
+                            </div>
                           </div>
 
                           <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/60">
@@ -1067,8 +1072,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
         <div className="space-y-5">
           {/* Honest Usage Attribution Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-              <div className="text-[11px] font-mono uppercase text-slate-400">
+            <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-cyan-500 bg-[#0B111E] p-4 shadow-lg">
+              <div className="text-[11px] font-mono uppercase text-cyan-300">
                 Total Metered Runs
               </div>
               <div className="text-2xl font-bold text-white mt-1 font-mono">
@@ -1079,7 +1084,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               </div>
             </div>
 
-            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/15 p-4">
+            <div className="rounded-xl border border-emerald-500/30 border-l-4 border-l-emerald-500 bg-[#0B111E] p-4 shadow-lg">
               <div className="text-[11px] font-mono uppercase text-emerald-300">
                 Live Cloud API Tokens (`live_api`)
               </div>
@@ -1091,7 +1096,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               </div>
             </div>
 
-            <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/15 p-4">
+            <div className="rounded-xl border border-indigo-500/30 border-l-4 border-l-indigo-500 bg-[#0B111E] p-4 shadow-lg">
               <div className="text-[11px] font-mono uppercase text-indigo-300">
                 Simulation Tokens (`mock_estimate`)
               </div>
@@ -1103,8 +1108,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-800 bg-slate-900/70 p-4">
-              <div className="text-[11px] font-mono uppercase text-slate-400">
+            <div className="rounded-xl border border-amber-500/30 border-l-4 border-l-amber-500 bg-[#0B111E] p-4 shadow-lg">
+              <div className="text-[11px] font-mono uppercase text-amber-300">
                 Estimated Workspace Spend
               </div>
               <div className="text-2xl font-bold text-amber-300 mt-1 font-mono">
@@ -1117,7 +1122,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
           </div>
 
           {/* Interactive What-If Enterprise Scale Calculator */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
               <div className="flex items-center gap-2">
                 <Sliders className="w-4 h-4 text-indigo-400" />
@@ -1341,66 +1346,72 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
             {/* 1-Click Governance Boundary Tests */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs font-bold text-amber-300">
-                    Boundary Test 1: Privilege Escalation Guard (`403 Forbidden`)
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Simulates a non-owner (`Admin` / `{activeActorRole === 'owner' ? 'admin' : activeActorRole}`) attempting to grant `owner` privileges. Only `Owner` can assign `Owner`.
-                  </p>
+              <div className="p-4 rounded-xl bg-[#070B14] border border-slate-800 border-l-4 border-l-amber-500 space-y-2">
+                <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/35">
+                    Boundary Test 1 • HTTP 403
+                  </span>
+                  <button
+                    type="button"
+                    disabled={savingMember}
+                    onClick={() =>
+                      handleUpsertMember(
+                        'escalation.probe@ordaris.runtime',
+                        'Escalation Probe',
+                        'owner',
+                        activeActorRole === 'owner'
+                          ? activeOrgSlug === 'beta-logistics'
+                            ? 'beta-admin'
+                            : 'acme-admin'
+                          : undefined,
+                      )
+                    }
+                    className="px-3 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold shrink-0"
+                  >
+                    Test Owner Grant (403)
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  disabled={savingMember}
-                  onClick={() =>
-                    handleUpsertMember(
-                      'escalation.probe@ordaris.runtime',
-                      'Escalation Probe',
-                      'owner',
-                      activeActorRole === 'owner'
-                        ? activeOrgSlug === 'beta-logistics'
-                          ? 'beta-admin'
-                          : 'acme-admin'
-                        : undefined,
-                    )
-                  }
-                  className="px-3 py-1.5 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold shrink-0"
-                >
-                  Test Owner Grant (403)
-                </button>
+                <div className="text-xs font-bold text-white">
+                  Privilege Escalation Guard (`403 Forbidden`)
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Simulates a non-owner (`Admin` / `{activeActorRole === 'owner' ? 'admin' : activeActorRole}`) attempting to grant `owner` privileges. Only `Owner` can assign `Owner`.
+                </p>
               </div>
 
-              <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-xs font-bold text-rose-300">
-                    Boundary Test 2: Last-Owner Demotion Safeguard (`409 Conflict`)
-                  </div>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Attempts to remove the primary organization `Owner` as `Owner`, proving the server blocks tenant lock-out with `HTTP 409 LAST_OWNER_PROTECTED`.
-                  </p>
+              <div className="p-4 rounded-xl bg-[#070B14] border border-slate-800 border-l-4 border-l-rose-500 space-y-2">
+                <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/35">
+                    Boundary Test 2 • HTTP 409
+                  </span>
+                  <button
+                    type="button"
+                    disabled={savingMember}
+                    onClick={() => {
+                      const soleOwner = members.find((m) => m.role === 'owner');
+                      if (soleOwner) {
+                        const ownerPersona =
+                          activeOrgSlug === 'beta-logistics'
+                            ? 'beta-owner'
+                            : 'acme-owner';
+                        void handleRemoveMember(
+                          soleOwner.userId,
+                          soleOwner.email,
+                          activeActorRole !== 'owner' ? ownerPersona : undefined
+                        );
+                      }
+                    }}
+                    className="px-3 py-1 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold shrink-0"
+                  >
+                    Test Last-Owner 409
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  disabled={savingMember}
-                  onClick={() => {
-                    const soleOwner = members.find((m) => m.role === 'owner');
-                    if (soleOwner) {
-                      const ownerPersona =
-                        activeOrgSlug === 'beta-logistics'
-                          ? 'beta-owner'
-                          : 'acme-owner';
-                      void handleRemoveMember(
-                        soleOwner.userId,
-                        soleOwner.email,
-                        activeActorRole !== 'owner' ? ownerPersona : undefined
-                      );
-                    }
-                  }}
-                  className="px-3 py-1.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/30 text-rose-300 text-xs font-mono font-bold shrink-0"
-                >
-                  Test Last-Owner 409
-                </button>
+                <div className="text-xs font-bold text-white">
+                  Last-Owner Demotion Safeguard (`409 Conflict`)
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Attempts to remove the primary organization `Owner` as `Owner`, proving the server blocks tenant lock-out with `HTTP 409 LAST_OWNER_PROTECTED`.
+                </p>
               </div>
             </div>
 
@@ -2278,7 +2289,7 @@ XAI_API_KEY=`;
   return (
     <div className="space-y-6">
       {/* Part 1: 3-Tier AI Engine Resolution Matrix */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -2337,40 +2348,40 @@ XAI_API_KEY=`;
 
         {/* 3-Tier Architecture Summary Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/30">
-            <div className="flex items-center justify-between font-bold text-emerald-300">
+          <div className="p-3.5 rounded-xl bg-[#070B14] border border-emerald-500/30 border-l-4 border-l-emerald-500">
+            <div className="flex items-center justify-between font-bold text-emerald-300 pb-2 mb-1.5 border-b border-slate-800/80">
               <span>Tier 1: Session BYOK Vault (RAM)</span>
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-500/20">
                 {sessionVaultCount} configured
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1">
+            <p className="text-[11px] text-slate-300">
               AES-256-GCM encrypted in server memory under session scope{' '}
               <code className="text-emerald-200 font-mono">{sessionId.slice(0, 14)}…</code> with a 2-hour sliding TTL.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-indigo-950/25 border border-indigo-500/30">
-            <div className="flex items-center justify-between font-bold text-indigo-300">
+          <div className="p-3.5 rounded-xl bg-[#070B14] border border-indigo-500/30 border-l-4 border-l-indigo-500">
+            <div className="flex items-center justify-between font-bold text-indigo-300 pb-2 mb-1.5 border-b border-slate-800/80">
               <span>Tier 2: Free &amp; Server `.env` Engines</span>
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-500/20">
                 2 Always Free{serverEnvCount > 0 ? ` • ${serverEnvCount} .env` : ''}
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1">
+            <p className="text-[11px] text-slate-300">
               <code className="text-emerald-300 font-mono">gemini-free</code> (Gemini 3 Flash, default fallback) &amp;{' '}
               <code className="text-emerald-300 font-mono">openrouter-free</code> (Llama 3.3 70B) work out-of-the-box.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-amber-950/20 border border-amber-500/30">
-            <div className="flex items-center justify-between font-bold text-amber-300">
+          <div className="p-3.5 rounded-xl bg-[#070B14] border border-amber-500/30 border-l-4 border-l-amber-500">
+            <div className="flex items-center justify-between font-bold text-amber-300 pb-2 mb-1.5 border-b border-slate-800/80">
               <span>Paid BYOK Gate (No Longer Free)</span>
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-amber-500/20">
                 ChatGPT • Claude • Grok
               </span>
             </div>
-            <p className="text-[11px] text-slate-300 mt-1">
+            <p className="text-[11px] text-slate-300">
               Requires <code className="text-amber-200 font-mono">OPENAI_API_KEY</code>,{' '}
               <code className="text-amber-200 font-mono">ANTHROPIC_API_KEY</code>, or{' '}
               <code className="text-amber-200 font-mono">XAI_API_KEY</code> in your Session BYOK Vault.
@@ -2562,7 +2573,7 @@ XAI_API_KEY=`;
       </div>
 
       {/* Part 2: Structured Server Log Explorer */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
@@ -2704,7 +2715,7 @@ XAI_API_KEY=`;
           </div>
         </div>
 
-        <div className="rounded-xl bg-slate-950 border border-slate-800 p-3 max-h-96 overflow-y-auto space-y-2 font-mono text-xs">
+        <div className="rounded-xl bg-[#070B14] border border-slate-800 p-3 max-h-96 overflow-y-auto space-y-2.5 font-mono text-xs">
           {filteredLogs.length === 0 ? (
             <div className="py-6 text-center text-slate-500">
               {logsForbiddenReason
@@ -2718,17 +2729,20 @@ XAI_API_KEY=`;
                 entry.context && Object.keys(entry.context).length > 0;
               const isExpanded =
                 expandAllLogs || Boolean(expandedLogKeys[rowKey]);
+              const levelBorder =
+                entry.level === 'error'
+                  ? 'border-l-rose-500'
+                  : entry.level === 'warn'
+                    ? 'border-l-amber-500'
+                    : 'border-l-emerald-500';
 
               return (
                 <div
                   key={rowKey}
-                  className="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800/80 space-y-2"
+                  className={`p-3 rounded-xl bg-[#0B111E] border border-slate-800/80 border-l-4 ${levelBorder} space-y-2`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] text-slate-500">
-                        {new Date(entry.timestamp).toLocaleTimeString()}
-                      </span>
                       <span
                         className={`px-1.5 py-0.5 rounded text-[10px] uppercase font-bold ${
                           entry.level === 'error'
@@ -2745,6 +2759,9 @@ XAI_API_KEY=`;
                           [{entry.component}]
                         </span>
                       )}
+                      <span className="text-[10px] text-slate-500">
+                        {new Date(entry.timestamp).toLocaleTimeString()}
+                      </span>
                       <span className="font-bold text-white">
                         {entry.message || entry.event}
                       </span>

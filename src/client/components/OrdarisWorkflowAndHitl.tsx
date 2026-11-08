@@ -618,7 +618,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
       {/* Section 1: Clickable 6-Node Visual DAG Pipeline + Step Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-7">
         {/* Left 8 cols: Interactive 6-Node Pipeline & Launch Controls */}
-        <div className="lg:col-span-8 rounded-2xl border border-slate-800/90 bg-slate-900/70 p-5 lg:p-6 space-y-6 shadow-xl">
+        <div className="lg:col-span-8 rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 lg:p-6 space-y-6 shadow-xl">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
             <div>
               <div className="text-xs font-mono uppercase tracking-wider text-indigo-400">
@@ -661,23 +661,32 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                       ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
                       : 'bg-slate-800 text-slate-400 border-slate-700';
 
+              const leftBorderAccent =
+                vStatus === 'waiting'
+                  ? 'border-l-amber-500'
+                  : vStatus === 'completed'
+                    ? 'border-l-emerald-500'
+                    : vStatus === 'bypassed'
+                      ? 'border-l-sky-500'
+                      : 'border-l-slate-700';
+
               return (
                 <button
                   key={node.id}
                   type="button"
                   onClick={() => setSelectedNodeId(node.id)}
-                  className={`text-left rounded-2xl p-4 border transition-all relative ${
+                  className={`text-left rounded-xl p-4 border border-l-4 ${leftBorderAccent} transition-all relative ${
                     isSelected
-                      ? 'bg-indigo-950/45 border-indigo-500 ring-1 ring-indigo-500/40 shadow-lg'
-                      : 'bg-slate-950/80 border-slate-800 hover:border-slate-700'
+                      ? 'bg-[#121D35] border-indigo-500 ring-1 ring-indigo-500/40 shadow-lg'
+                      : 'bg-[#070B14] border-slate-800 hover:border-slate-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="text-[11px] font-mono uppercase px-2 py-0.5 rounded-md bg-slate-900 text-slate-300 border border-slate-800">
-                      {node.type}
+                  <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800/80">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-slate-900 text-indigo-300 border border-slate-800">
+                      #{idx + 1} • {node.type}
                     </span>
                     <span
-                      className={`text-[11px] font-mono px-2 py-0.5 rounded-md border ${badgeStyle}`}
+                      className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${badgeStyle}`}
                     >
                       {vStatus === 'waiting'
                         ? 'PAUSED AT HITL'
@@ -695,7 +704,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                       <ArrowRight className="w-4 h-4 text-slate-500 shrink-0" />
                     )}
                   </div>
-                  <div className="text-xs font-mono text-indigo-300/90 mt-1">
+                  <div className="text-[11px] font-mono text-indigo-300/90 mt-1">
                     id: {node.id}
                   </div>
                   <p className="text-xs text-slate-300 mt-2 leading-relaxed">
@@ -866,15 +875,15 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
         {/* Right 4 cols: Selected Node Inspector + 3-Color DFS Cycle Validator */}
         <div className="lg:col-span-4 space-y-5">
           {/* Selected Node Deep Inspector */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-cyan-500 bg-[#0B111E] p-4 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <div className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-indigo-400" />
+                <Cpu className="w-4 h-4 text-cyan-400" />
                 <span className="text-xs font-bold uppercase tracking-wider text-white">
                   DAG Node Step Inspector
                 </span>
               </div>
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">
                 {inspectedNode.id}
               </span>
             </div>
@@ -907,7 +916,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 <div className="text-[10px] font-mono uppercase text-slate-400">
                   Execution Contract
                 </div>
-                <div className="p-2 rounded bg-slate-950 border border-slate-800 font-mono text-[11px] text-emerald-300 mt-0.5">
+                <div className="p-2 rounded bg-[#070B14] border border-slate-800 font-mono text-[11px] text-emerald-300 mt-0.5">
                   {inspectedNode.configSummary}
                 </div>
               </div>
@@ -925,8 +934,8 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
           </div>
 
           {/* 3-Color DFS DAG Topology & Cycle Validator */}
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#0B111E] p-4 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-emerald-400" />
                 <span className="text-xs font-bold uppercase tracking-wider text-white">
@@ -1011,7 +1020,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
       </div>
 
       {/* Section 2: Rich HITL Governance Approval Queue */}
-      <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
+      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-amber-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
           <div className="flex items-center gap-2.5">
             <ShieldAlert className="w-5 h-5 text-amber-400" />
@@ -1125,17 +1134,19 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
               return (
                 <div
                   key={item.id}
-                  className={`rounded-xl border p-4 transition-all ${
+                  className={`rounded-xl border border-l-4 p-4 transition-all ${
                     isPending
-                      ? 'bg-slate-950/90 border-amber-500/40 shadow-lg shadow-amber-950/10'
-                      : 'bg-slate-950/50 border-slate-800'
+                      ? 'bg-[#070B14] border-amber-500/40 border-l-amber-500 shadow-lg shadow-amber-950/10'
+                      : item.status === 'approved'
+                        ? 'bg-[#070B14] border-slate-800 border-l-emerald-500'
+                        : 'bg-[#070B14] border-slate-800 border-l-rose-500'
                   }`}
                 >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="space-y-1">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
                       <div className="flex flex-wrap items-center gap-2">
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase border ${
                             item.status === 'pending'
                               ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
                               : item.status === 'approved'
@@ -1146,7 +1157,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                           {item.status}
                         </span>
                         <span
-                          className={`px-2 py-0.5 rounded text-[10px] font-mono border ${
+                          className={`px-2 py-0.5 rounded-md text-[10px] font-mono border ${
                             item.status === 'approved'
                               ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                               : item.status === 'rejected'
@@ -1160,35 +1171,35 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                               ? 'REJECTED • RUN TERMINATED'
                               : 'CRITICAL RISK >= 100 • HITL GATE'}
                         </span>
-                        <span className="text-xs font-mono text-slate-400">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300">
                           Node: <strong className="text-indigo-300">{displayNodeId}</strong>
                         </span>
-                        <span className="text-xs font-mono text-slate-500">
+                        <span className="text-[11px] font-mono text-slate-500">
                           Run: {item.runId.slice(0, 12)}...
                         </span>
                       </div>
-                      <h4 className="text-sm font-bold text-white">{item.title}</h4>
-                    </div>
 
-                    <div className="flex items-center gap-3">
-                      {isPending && onSelectRunToInspect && (
-                        <button
-                          type="button"
-                          onClick={() => onSelectRunToInspect(item.runId)}
-                          className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-mono text-indigo-300"
-                        >
-                          Inspect Run Trace ➔
-                        </button>
-                      )}
-                      <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-500" />
-                        <span>
-                          {new Date(
-                            (!isPending && item.decidedAt) || item.createdAt
-                          ).toLocaleString()}
-                        </span>
+                      <div className="flex items-center gap-3">
+                        {isPending && onSelectRunToInspect && (
+                          <button
+                            type="button"
+                            onClick={() => onSelectRunToInspect(item.runId)}
+                            className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-mono text-indigo-300"
+                          >
+                            Inspect Run Trace ➔
+                          </button>
+                        )}
+                        <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-slate-500" />
+                          <span>
+                            {new Date(
+                              (!isPending && item.decidedAt) || item.createdAt
+                            ).toLocaleString()}
+                          </span>
+                        </div>
                       </div>
                     </div>
+                    <h4 className="text-sm font-bold text-white">{item.title}</h4>
                   </div>
 
                   {/* Proposed Action Payload */}
