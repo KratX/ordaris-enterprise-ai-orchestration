@@ -563,9 +563,9 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
   return (
     <div className="space-y-7">
       {/* Top Banner: Workflow Architecture & RBAC Posture */}
-      <div className="rounded-2xl border border-slate-800/90 bg-slate-900/75 p-5 lg:p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+      <div className="rounded-2xl border border-zinc-800/90 bg-zinc-900/75 p-5 lg:p-6 flex flex-wrap items-center justify-between gap-4 shadow-xl">
         <div className="flex items-start gap-3.5">
-          <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400">
+          <div className="p-3 rounded-xl bg-zinc-100 text-zinc-950 border border-white">
             <GitBranch className="w-5 h-5" />
           </div>
           <div>
@@ -573,27 +573,27 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
               <h2 className="text-base sm:text-lg font-bold text-white">
                 Deterministic DAG Workflow Engine &amp; HITL Governance Queue
               </h2>
-              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono bg-zinc-100 text-zinc-950 font-semibold border border-zinc-200">
                 {activeOrgName}
               </span>
-              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono bg-slate-800 text-slate-200 border border-slate-700">
+              <span className="px-2.5 py-0.5 rounded-lg text-xs font-mono bg-zinc-800 text-zinc-200 border border-zinc-700">
                 6-Node Production Graph
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1.5 leading-relaxed max-w-4xl">
+            <p className="text-xs sm:text-sm text-zinc-300 mt-1.5 leading-relaxed max-w-4xl">
               Validates acyclic graph topology via 3-color DFS, evaluates quantitative risk thresholds (`risk &gt;= 100`), and enforces role-gated Human-in-the-Loop (`Owner` / `Admin`) sign-off before executing high-impact remediation.
             </p>
           </div>
         </div>
 
         {/* Active Persona Permission Pill */}
-        <div className="flex items-center gap-2.5 bg-slate-950/90 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs">
+        <div className="flex items-center gap-2.5 bg-zinc-950/90 border border-zinc-800 rounded-xl px-3.5 py-2.5 text-xs">
           <Lock className="w-4 h-4 text-amber-400" />
-          <span className="text-slate-300">Active Role:</span>
+          <span className="text-zinc-300">Active Role:</span>
           <span className="font-mono font-bold uppercase text-white">
             {activeActorRole}
           </span>
-          <span className="text-slate-600">|</span>
+          <span className="text-zinc-600">|</span>
           <span
             className={`px-2 py-0.5 rounded-md text-[11px] font-mono ${
               canExecuteWorkflow
@@ -618,10 +618,10 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
       {/* Section 1: Clickable 6-Node Visual DAG Pipeline + Step Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-7">
         {/* Left 8 cols: Interactive 6-Node Pipeline & Launch Controls */}
-        <div className="lg:col-span-8 rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 lg:p-6 space-y-6 shadow-xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+        <div className="lg:col-span-8 rounded-xl border border-zinc-800/90 border-l-4 border-l-zinc-200 bg-[#111113] p-5 lg:p-6 space-y-6 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-4">
             <div>
-              <div className="text-xs font-mono uppercase tracking-wider text-indigo-400">
+              <div className="text-xs font-mono uppercase tracking-wider text-zinc-300">
                 Interactive DAG Topology Map (Click Any Node to Inspect)
               </div>
               <div className="text-base font-bold text-white mt-1">
@@ -635,7 +635,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
               <select
                 value={activeWorkflow?.id || ''}
                 onChange={(e) => setSelectedWorkflowId(e.target.value)}
-                className="bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 font-mono"
+                className="bg-zinc-950 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono"
               >
                 {workflows.map((wf) => (
                   <option key={wf.id} value={wf.id}>
@@ -659,7 +659,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
                     : vStatus === 'bypassed'
                       ? 'bg-sky-500/15 text-sky-300 border-sky-500/30'
-                      : 'bg-slate-800 text-slate-400 border-slate-700';
+                      : 'bg-zinc-800 text-zinc-400 border-zinc-700';
 
               const leftBorderAccent =
                 vStatus === 'waiting'
@@ -668,7 +668,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     ? 'border-l-emerald-500'
                     : vStatus === 'bypassed'
                       ? 'border-l-sky-500'
-                      : 'border-l-slate-700';
+                      : 'border-l-zinc-700';
 
               return (
                 <button
@@ -677,12 +677,12 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   onClick={() => setSelectedNodeId(node.id)}
                   className={`text-left rounded-xl p-4 border border-l-4 ${leftBorderAccent} transition-all relative ${
                     isSelected
-                      ? 'bg-[#121D35] border-indigo-500 ring-1 ring-indigo-500/40 shadow-lg'
-                      : 'bg-[#070B14] border-slate-800 hover:border-slate-700'
+                      ? 'bg-[#18181B] border-zinc-200 ring-1 ring-white/30 shadow-lg'
+                      : 'bg-[#09090B] border-zinc-800 hover:border-zinc-700'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-800/80">
-                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-slate-900 text-indigo-300 border border-slate-800">
+                  <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-zinc-800/80">
+                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-md bg-zinc-900 text-zinc-200 border border-zinc-800">
                       #{idx + 1} • {node.type}
                     </span>
                     <span
@@ -701,13 +701,13 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   <div className="text-sm font-bold text-white flex items-center justify-between">
                     <span>{node.label}</span>
                     {idx < STANDARD_6_NODE_DAG.length - 1 && (
-                      <ArrowRight className="w-4 h-4 text-slate-500 shrink-0" />
+                      <ArrowRight className="w-4 h-4 text-zinc-500 shrink-0" />
                     )}
                   </div>
-                  <div className="text-[11px] font-mono text-indigo-300/90 mt-1">
+                  <div className="text-[11px] font-mono text-zinc-300 mt-1">
                     id: {node.id}
                   </div>
-                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                  <p className="text-xs text-zinc-300 mt-2 leading-relaxed">
                     {node.description}
                   </p>
                 </button>
@@ -716,15 +716,15 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
           </div>
 
           {/* Workflow Risk Preset Launcher */}
-          <div className="rounded-xl border border-slate-800 bg-slate-950/80 p-4 space-y-4">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-950/80 p-4 space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-indigo-400" />
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                <Sliders className="w-4 h-4 text-zinc-200" />
+                <span className="text-xs font-bold uppercase tracking-wider text-zinc-200">
                   Workflow Execution Presets (Quantitative Risk Branch Tester)
                 </span>
               </div>
-              <span className="text-[11px] font-mono text-slate-400">
+              <span className="text-[11px] font-mono text-zinc-400">
                 HITL Gate Threshold: <strong className="text-amber-300">risk_score &gt;= 100</strong>
               </span>
             </div>
@@ -736,7 +736,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 className={`p-3 rounded-lg border text-left transition-all ${
                   riskPresetMode === 'high'
                     ? 'bg-amber-500/10 border-amber-500/50 text-amber-200'
-                    : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-slate-700'
+                    : 'bg-zinc-900/70 border-zinc-800 text-zinc-300 hover:border-zinc-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -747,7 +747,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     25 * 6 = 150
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-zinc-400 mt-1">
                   Exceeds `risk &gt;= 100` threshold ➔ Pauses at `approval-high-risk` and creates a live HITL card.
                 </p>
               </button>
@@ -758,7 +758,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 className={`p-3 rounded-lg border text-left transition-all ${
                   riskPresetMode === 'low'
                     ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-200'
-                    : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-slate-700'
+                    : 'bg-zinc-900/70 border-zinc-800 text-zinc-300 hover:border-zinc-700'
                 }`}
               >
                 <div className="flex items-center justify-between">
@@ -769,7 +769,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     20 * 3 = 60
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-zinc-400 mt-1">
                   Below `risk &gt;= 100` threshold ➔ Bypasses HITL gate and completes all 6 DAG nodes immediately.
                 </p>
               </button>
@@ -777,7 +777,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1">
                   calc_math Risk Expression
                 </label>
                 <input
@@ -788,26 +788,26 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                     setCustomRiskExpr(e.target.value);
                   }}
                   placeholder="25 * 6"
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs font-mono text-white"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs font-mono text-white"
                 />
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1">
                   Operational Trigger Context
                 </label>
                 <input
                   type="text"
                   value={workflowTriggerNote}
                   onChange={(e) => setWorkflowTriggerNote(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-200"
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-              <div className="text-[11px] text-slate-400">
+              <div className="text-[11px] text-zinc-400">
                 Executing as <strong className="text-white font-mono">{activeActorRole}</strong> with AI engine{' '}
-                <strong className="text-indigo-300 font-mono">{selectedEngine}</strong>
+                <strong className="text-zinc-200 font-mono">{selectedEngine}</strong>
               </div>
 
               <button
@@ -816,7 +816,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 disabled={executingWorkflow}
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
                   canExecuteWorkflow
-                    ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20'
+                    ? 'bg-white hover:bg-zinc-200 text-zinc-950 shadow-sm'
                     : 'bg-rose-950/80 hover:bg-rose-900/80 text-rose-200 border border-rose-500/40'
                 }`}
               >
@@ -862,7 +862,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   <button
                     type="button"
                     onClick={() => onSelectRunToInspect(lastWorkflowResult.runId)}
-                    className="px-2.5 py-1 rounded bg-slate-900/90 hover:bg-slate-800 text-indigo-300 font-mono text-[11px] border border-slate-700"
+                    className="px-2.5 py-1 rounded bg-zinc-900/90 hover:bg-zinc-800 text-zinc-100 font-mono text-[11px] border border-zinc-700"
                   >
                     Inspect Run Trace ➔
                   </button>
@@ -875,8 +875,8 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
         {/* Right 4 cols: Selected Node Inspector + 3-Color DFS Cycle Validator */}
         <div className="lg:col-span-4 space-y-5">
           {/* Selected Node Deep Inspector */}
-          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-cyan-500 bg-[#0B111E] p-4 space-y-3 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+          <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-cyan-500 bg-[#111113] p-4 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
               <div className="flex items-center gap-2">
                 <Cpu className="w-4 h-4 text-cyan-400" />
                 <span className="text-xs font-bold uppercase tracking-wider text-white">
@@ -890,22 +890,22 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
 
             <div className="space-y-2.5 text-xs">
               <div>
-                <div className="text-[10px] font-mono uppercase text-slate-400">
+                <div className="text-[10px] font-mono uppercase text-zinc-400">
                   Node Title & Type
                 </div>
                 <div className="text-sm font-bold text-white mt-0.5">
                   {inspectedNode.label}{' '}
-                  <span className="text-xs font-mono text-indigo-400">
+                  <span className="text-xs font-mono text-cyan-300">
                     [{inspectedNode.type}]
                   </span>
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-mono uppercase text-slate-400">
+                <div className="text-[10px] font-mono uppercase text-zinc-400">
                   Upstream Dependencies (dependsOn)
                 </div>
-                <div className="font-mono text-slate-200 mt-0.5">
+                <div className="font-mono text-zinc-200 mt-0.5">
                   {inspectedNode.dependsOn.length > 0
                     ? inspectedNode.dependsOn.join(' ➔ ')
                     : 'None (Root Entry Node)'}
@@ -913,19 +913,19 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
               </div>
 
               <div>
-                <div className="text-[10px] font-mono uppercase text-slate-400">
+                <div className="text-[10px] font-mono uppercase text-zinc-400">
                   Execution Contract
                 </div>
-                <div className="p-2 rounded bg-[#070B14] border border-slate-800 font-mono text-[11px] text-emerald-300 mt-0.5">
+                <div className="p-2 rounded bg-[#09090B] border border-zinc-800 font-mono text-[11px] text-emerald-300 mt-0.5">
                   {inspectedNode.configSummary}
                 </div>
               </div>
 
               <div>
-                <div className="text-[10px] font-mono uppercase text-slate-400">
+                <div className="text-[10px] font-mono uppercase text-zinc-400">
                   Security & Governance Guardrail
                 </div>
-                <div className="text-slate-300 mt-0.5 flex items-center gap-1.5">
+                <div className="text-zinc-300 mt-0.5 flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>{inspectedNode.securityControl}</span>
                 </div>
@@ -934,20 +934,20 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
           </div>
 
           {/* 3-Color DFS DAG Topology & Cycle Validator */}
-          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#0B111E] p-4 space-y-3 shadow-xl">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
+          <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-emerald-500 bg-[#111113] p-4 space-y-3 shadow-xl">
+            <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2.5">
               <div className="flex items-center gap-2">
                 <Layers className="w-4 h-4 text-emerald-400" />
                 <span className="text-xs font-bold uppercase tracking-wider text-white">
                   3-Color DFS DAG Cycle Validator
                 </span>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">
+              <span className="text-[10px] font-mono text-zinc-400">
                 POST /workflows/validate-dag
               </span>
             </div>
 
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-400">
               Before saving or executing any workflow version, Ordaris runs a 3-color depth-first search (`WHITE` ➔ `GRAY` ➔ `BLACK`) to reject circular dependencies and compute a deterministic topological order.
             </p>
 
@@ -1020,8 +1020,8 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
       </div>
 
       {/* Section 2: Rich HITL Governance Approval Queue */}
-      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-amber-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+      <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-amber-500 bg-[#111113] p-5 space-y-4 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3.5">
           <div className="flex items-center gap-2.5">
             <ShieldAlert className="w-5 h-5 text-amber-400" />
             <div>
@@ -1031,7 +1031,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   {pendingApprovals.length} Pending
                 </span>
               </h3>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-zinc-400">
                 High-risk workflow branches (`risk_score &gt;= 100`) pause in `waiting_approval` until an authorized `Owner` or `Admin` submits a signed decision note.
               </p>
             </div>
@@ -1039,14 +1039,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
 
           <div className="flex flex-wrap items-center gap-2">
             {/* Filter Tabs */}
-            <div className="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs">
+            <div className="inline-flex rounded-lg bg-zinc-950 p-1 border border-zinc-800 text-xs">
               <button
                 type="button"
                 onClick={() => setApprovalFilter('pending')}
                 className={`px-2.5 py-1 rounded-md font-mono transition-all ${
                   approvalFilter === 'pending'
                     ? 'bg-amber-500/20 text-amber-300 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Pending ({pendingApprovals.length})
@@ -1057,7 +1057,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 className={`px-2.5 py-1 rounded-md font-mono transition-all ${
                   approvalFilter === 'resolved'
                     ? 'bg-emerald-500/20 text-emerald-300 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Resolved ({resolvedApprovals.length})
@@ -1067,8 +1067,8 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 onClick={() => setApprovalFilter('all')}
                 className={`px-2.5 py-1 rounded-md font-mono transition-all ${
                   approvalFilter === 'all'
-                    ? 'bg-indigo-500/20 text-indigo-300 font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-zinc-950 font-bold'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 All ({approvals.length})
@@ -1099,14 +1099,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
         </div>
 
         {visibleApprovals.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-slate-800 bg-slate-950/50 p-8 text-center space-y-3">
+          <div className="rounded-xl border border-dashed border-zinc-800 bg-zinc-950/50 p-8 text-center space-y-3">
             <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
             <div className="text-sm font-semibold text-white">
               {approvalFilter === 'pending'
                 ? 'No Pending HITL Approvals in Queue'
                 : 'No Approval Records Match Filter'}
             </div>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
+            <p className="text-xs text-zinc-400 max-w-md mx-auto">
               Click <strong>"Preset A: High-Risk Action (Risk = 150)"</strong> and run the workflow above to trigger a live `waiting_approval` checkpoint.
             </p>
             {approvalFilter === 'pending' && resolvedApprovals.length > 0 && (
@@ -1114,7 +1114,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                 <button
                   type="button"
                   onClick={() => setApprovalFilter('resolved')}
-                  className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700 text-xs font-mono text-emerald-300 transition-all"
+                  className="px-3 py-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-mono text-emerald-300 transition-all"
                 >
                   View Resolved Decisions ({resolvedApprovals.length}) ➔
                 </button>
@@ -1136,14 +1136,14 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   key={item.id}
                   className={`rounded-xl border border-l-4 p-4 transition-all ${
                     isPending
-                      ? 'bg-[#070B14] border-amber-500/40 border-l-amber-500 shadow-lg shadow-amber-950/10'
+                      ? 'bg-[#09090B] border-amber-500/40 border-l-amber-500 shadow-lg shadow-amber-950/10'
                       : item.status === 'approved'
-                        ? 'bg-[#070B14] border-slate-800 border-l-emerald-500'
-                        : 'bg-[#070B14] border-slate-800 border-l-rose-500'
+                        ? 'bg-[#09090B] border-zinc-800 border-l-emerald-500'
+                        : 'bg-[#09090B] border-zinc-800 border-l-rose-500'
                   }`}
                 >
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800/80">
                       <div className="flex flex-wrap items-center gap-2">
                         <span
                           className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase border ${
@@ -1171,10 +1171,10 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                               ? 'REJECTED • RUN TERMINATED'
                               : 'CRITICAL RISK >= 100 • HITL GATE'}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md bg-slate-900 border border-slate-800 text-[11px] font-mono text-slate-300">
-                          Node: <strong className="text-indigo-300">{displayNodeId}</strong>
+                        <span className="px-2 py-0.5 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300">
+                          Node: <strong className="text-zinc-100">{displayNodeId}</strong>
                         </span>
-                        <span className="text-[11px] font-mono text-slate-500">
+                        <span className="text-[11px] font-mono text-zinc-500">
                           Run: {item.runId.slice(0, 12)}...
                         </span>
                       </div>
@@ -1184,13 +1184,13 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                           <button
                             type="button"
                             onClick={() => onSelectRunToInspect(item.runId)}
-                            className="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[11px] font-mono text-indigo-300"
+                            className="px-2.5 py-1 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-[11px] font-mono text-zinc-200"
                           >
                             Inspect Run Trace ➔
                           </button>
                         )}
-                        <div className="text-[11px] font-mono text-slate-400 flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-slate-500" />
+                        <div className="text-[11px] font-mono text-zinc-400 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-zinc-500" />
                           <span>
                             {new Date(
                               (!isPending && item.decidedAt) || item.createdAt
@@ -1203,18 +1203,18 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                   </div>
 
                   {/* Proposed Action Payload */}
-                  <div className="mt-3 p-3 rounded-lg bg-slate-900/90 border border-slate-800 text-xs text-slate-300 font-mono">
-                    <div className="text-[10px] uppercase text-slate-400 mb-1">
+                  <div className="mt-3 p-3 rounded-lg bg-zinc-900/90 border border-zinc-800 text-xs text-zinc-300 font-mono">
+                    <div className="text-[10px] uppercase text-zinc-400 mb-1">
                       Proposed High-Impact Action & Trigger Reason:
                     </div>
                     {item.reason}
                   </div>
 
                   {isPending ? (
-                    <div className="mt-3 pt-3 border-t border-slate-800/80 space-y-3">
+                    <div className="mt-3 pt-3 border-t border-zinc-800/80 space-y-3">
                       <div>
                         <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
-                          <label className="text-[11px] font-mono text-slate-400">
+                          <label className="text-[11px] font-mono text-zinc-400">
                             Reviewer Justification Note (Persisted in Immutable Audit Ledger):
                           </label>
                           <div className="flex items-center gap-1.5">
@@ -1228,7 +1228,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                                     : 'CISO verified lateral movement IOCs; approved immediate subnet quarantine.',
                                 }))
                               }
-                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-indigo-300"
+                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200"
                             >
                               + Fill Approval Note
                             </button>
@@ -1241,7 +1241,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                                     'Rejected: False-positive sensor spike confirmed by secondary telemetry probe.',
                                 }))
                               }
-                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-rose-300"
+                              className="text-[10px] font-mono px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700 text-rose-300"
                             >
                               + Fill Rejection Note
                             </button>
@@ -1257,13 +1257,13 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                             }))
                           }
                           placeholder="Enter compliance sign-off justification or click a quick-fill preset above..."
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                          className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white"
                         />
                       </div>
 
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                          <Info className="w-3.5 h-3.5 text-indigo-400" />
+                        <div className="text-[11px] text-zinc-400 flex items-center gap-1.5">
+                          <Info className="w-3.5 h-3.5 text-zinc-300" />
                           {canDecideApproval ? (
                             <span>
                               Your role (<strong className="text-emerald-300">{activeActorRole}</strong>) is authorized to sign off `approval.decide`.
@@ -1321,10 +1321,10 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                    <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-400">
                       <div>
-                        <span className="font-mono text-slate-400">Signed Decision Note:</span>{' '}
-                        <span className="text-slate-200 italic">
+                        <span className="font-mono text-zinc-400">Signed Decision Note:</span>{' '}
+                        <span className="text-zinc-200 italic">
                           "{item.decisionNote || 'Resolved via governance policy.'}"
                         </span>
                       </div>
@@ -1332,7 +1332,7 @@ export const OrdarisWorkflowAndHitl: React.FC<OrdarisWorkflowAndHitlProps> = ({
                         <button
                           type="button"
                           onClick={() => onSelectRunToInspect(item.runId)}
-                          className="text-[11px] font-mono text-indigo-400 hover:text-indigo-300"
+                          className="text-[11px] font-mono text-zinc-300 hover:text-white"
                         >
                           Inspect Run Trace ➔
                         </button>

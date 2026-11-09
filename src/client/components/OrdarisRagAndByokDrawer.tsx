@@ -515,18 +515,18 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                   isSpotlighted
                     ? 'bg-amber-950/25 border-amber-400/70 border-l-amber-400 ring-2 ring-amber-500/40 shadow-lg'
                     : item.source === 'vault'
-                      ? 'bg-[#0B111E] border-emerald-500/35 border-l-emerald-500'
+                      ? 'bg-[#111113] border-emerald-500/35 border-l-emerald-500'
                       : item.source === 'env'
-                        ? 'bg-[#0B111E] border-sky-500/35 border-l-sky-500'
+                        ? 'bg-[#111113] border-sky-500/35 border-l-sky-500'
                         : isAlwaysAvailableProvider
-                          ? 'bg-[#0B111E] border-slate-800 border-l-indigo-500'
-                          : 'bg-[#0B111E] border-slate-800 border-l-amber-500/70'
+                          ? 'bg-[#111113] border-zinc-800 border-l-zinc-200'
+                          : 'bg-[#111113] border-zinc-800 border-l-amber-500/70'
                 }`}
               >
                 <div className="space-y-2">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-slate-900 text-slate-300 border border-slate-700/80">
+                      <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-700/80">
                         {item.modelName}
                       </span>
                       {isSpotlighted && (
@@ -548,7 +548,7 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                         </span>
                       )}
                       {item.source === 'none' && isAlwaysAvailableProvider && (
-                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                        <span className="px-2 py-0.5 rounded-md text-[10px] font-mono bg-zinc-800 text-zinc-200 border border-zinc-700">
                           {item.provider === 'gemini'
                             ? 'Free • Always Available (Default Fallback)'
                             : 'Free • Always Available (Fallback: gemini-free)'}
@@ -566,7 +566,7 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                         type="button"
                         onClick={() => handleTestProvider(item.provider)}
                         disabled={isTesting || isSaving}
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 disabled:opacity-40 flex items-center gap-1.5"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700 disabled:opacity-40 flex items-center gap-1.5"
                       >
                         {isTesting ? (
                           <span
@@ -595,7 +595,7 @@ export const SessionByokVaultDrawer: React.FC<SessionByokVaultDrawerProps> = ({
                     <span className="text-xs font-bold text-white">
                       {item.label}
                     </span>
-                    <div className="text-[11px] text-slate-400 font-mono flex items-center gap-3">
+                    <div className="text-[11px] text-zinc-400 font-mono flex items-center gap-3">
                       <span>env: {item.envVarName}</span>
                       <a
                         href={item.docsUrl}
@@ -1135,14 +1135,14 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
         {/* LEFT COLUMN: Knowledge Corpus + Drag-and-Drop Ingestion Studio (5 cols) */}
         <div className="lg:col-span-5 space-y-6">
           {/* Active Tenant Corpus List */}
-          <div className="bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-xl">
-            <div className="flex items-center justify-between pb-3 mb-4 border-b border-slate-800/80">
+          <div className="bg-[#111113] border border-zinc-800/90 border-l-4 border-l-emerald-500 rounded-xl p-5 shadow-xl">
+            <div className="flex items-center justify-between pb-3 mb-4 border-b border-zinc-800/80">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
                   <Database className="w-4 h-4 text-emerald-400" />
                   <span>{activeOrgName} — RAG Corpus ({documents.length})</span>
                 </h3>
-                <p className="text-[11px] text-slate-400 mt-1">
+                <p className="text-[11px] text-zinc-400 mt-1">
                   Scoped to <code className="text-emerald-300 font-semibold">{activeOrgSlug}</code> via composite PostgreSQL FKs.
                 </p>
               </div>
@@ -1155,24 +1155,24 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="p-3.5 rounded-xl bg-[#070B14] border border-slate-800/90 border-l-2 border-l-emerald-500/70 hover:border-slate-700 transition-colors space-y-2"
+                  className="p-3.5 rounded-xl bg-[#09090B] border border-zinc-800/90 border-l-2 border-l-emerald-500/70 hover:border-zinc-700 transition-colors space-y-2"
                 >
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
                     <div className="flex flex-wrap items-center gap-1.5 text-[11px] font-mono">
-                      <span className="px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">
+                      <span className="px-2 py-0.5 rounded bg-zinc-900 text-zinc-300 border border-zinc-800">
                         {doc.sourceFilename}
                       </span>
                       <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-semibold">
                         {doc.chunkCount} chunk(s)
                       </span>
-                      <span className="text-slate-400">{doc.byteSize} B</span>
+                      <span className="text-zinc-400">{doc.byteSize} B</span>
                     </div>
                     <div className="flex items-center gap-1.5 shrink-0">
                       <button
                         type="button"
                         onClick={() => handleInspectDocument(doc.id)}
                         disabled={loadingDocId === doc.id}
-                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-slate-900 hover:bg-slate-800 text-slate-100 border border-slate-700 flex items-center gap-1.5"
+                        className="px-2.5 py-1 rounded-lg text-[11px] font-semibold bg-zinc-900 hover:bg-zinc-800 text-zinc-100 border border-zinc-700 flex items-center gap-1.5"
                       >
                         {loadingDocId === doc.id ? (
                           <span
@@ -1202,14 +1202,14 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     <div className="text-xs sm:text-sm font-bold text-white truncate">
                       {doc.title}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-mono shrink-0">
+                    <div className="text-[10px] text-zinc-400 font-mono shrink-0">
                       sha256: {doc.checksumSha256.slice(0, 14)}…
                     </div>
                   </div>
                 </div>
               ))}
               {documents.length === 0 && (
-                <div className="text-sm text-slate-400 py-8 text-center">
+                <div className="text-sm text-zinc-400 py-8 text-center">
                   No documents indexed for this organization yet.
                 </div>
               )}
@@ -1219,11 +1219,11 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
           {/* Document Ingestion & Adversarial Injection Tester */}
           <form
             onSubmit={handleIngestDocument}
-            className="bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-indigo-500 rounded-xl p-5 space-y-4 shadow-xl"
+            className="bg-[#111113] border border-zinc-800/90 border-l-4 border-l-zinc-200 rounded-xl p-5 space-y-4 shadow-xl"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800/80">
               <h3 className="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-2">
-                <Upload className="w-3.5 h-3.5 text-indigo-400" />
+                <Upload className="w-3.5 h-3.5 text-zinc-200" />
                 <span>Ingest Runbook / Test Threat T-03</span>
               </h3>
               <div className="flex items-center gap-1.5">
@@ -1338,22 +1338,22 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
         </div>
 
         {/* RIGHT COLUMN: Hybrid FTS + Vector Search & 3-Part Score Breakdown (7 cols) */}
-        <div className="lg:col-span-7 bg-[#0B111E] border border-slate-800/90 border-l-4 border-l-cyan-500 rounded-xl p-5 flex flex-col space-y-5 shadow-xl">
-          <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-slate-800/80">
+        <div className="lg:col-span-7 bg-[#111113] border border-zinc-800/90 border-l-4 border-l-cyan-500 rounded-xl p-5 flex flex-col space-y-5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-3 pb-3.5 border-b border-zinc-800/80">
             <div>
               <h3 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
                 <Search className="w-4 h-4 text-cyan-400" />
                 <span>Hybrid FTS + 64-d Vector Cosine Retrieval Inspector</span>
               </h3>
-              <p className="text-xs text-slate-300 mt-1">
+              <p className="text-xs text-zinc-300 mt-1">
                 Formula: <code className="text-emerald-300 font-semibold">0.45 × FTS + 0.40 × Lexical + 0.15 × VectorCosine</code>
               </p>
             </div>
 
             {/* Top-K & Retrieval Mode Controls */}
             <div className="flex items-center gap-2.5">
-              <div className="flex items-center gap-1.5 bg-[#070B14] border border-slate-800 rounded-xl px-2.5 py-1.5">
-                <span className="text-xs text-slate-400 font-mono">Mode:</span>
+              <div className="flex items-center gap-1.5 bg-[#09090B] border border-zinc-800 rounded-xl px-2.5 py-1.5">
+                <span className="text-xs text-zinc-400 font-mono">Mode:</span>
                 {(['hybrid', 'fts', 'vector'] as const).map((m) => (
                   <button
                     key={m}
@@ -1364,8 +1364,8 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     }}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold uppercase transition-colors ${
                       retrievalMode === m
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-white text-zinc-950 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     {m}
@@ -1373,8 +1373,8 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                 ))}
               </div>
 
-              <div className="flex items-center gap-1.5 bg-[#070B14] border border-slate-800 rounded-xl px-2.5 py-1.5">
-                <span className="text-xs text-slate-400 font-mono">Top-K:</span>
+              <div className="flex items-center gap-1.5 bg-[#09090B] border border-zinc-800 rounded-xl px-2.5 py-1.5">
+                <span className="text-xs text-zinc-400 font-mono">Top-K:</span>
                 {[1, 3, 5, 8].map((k) => (
                   <button
                     key={k}
@@ -1385,8 +1385,8 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     }}
                     className={`px-2 py-1 rounded-lg text-xs font-mono ${
                       topK === k
-                        ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-white text-zinc-950 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     {k}
@@ -1406,13 +1406,13 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                 if (e.key === 'Enter') void executeSearch();
               }}
               placeholder="Enter hybrid search query..."
-              className="flex-1 px-4 py-2.5 rounded-xl bg-[#070B14] border border-slate-800 text-sm text-white focus:outline-none focus:border-emerald-500/60"
+              className="flex-1 px-4 py-2.5 rounded-xl bg-[#09090B] border border-zinc-800 text-sm text-white focus:outline-none focus:border-zinc-500"
             />
             <button
               type="button"
               onClick={() => void executeSearch()}
               disabled={searching}
-              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-lg shadow-emerald-600/20 inline-flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl text-sm font-bold bg-white hover:bg-zinc-200 text-zinc-950 transition-colors shadow-sm inline-flex items-center gap-2"
             >
               {searching && (
                 <span
@@ -1426,7 +1426,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
 
           {/* Preset Query Chips */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400 font-mono">Presets:</span>
+            <span className="text-xs text-zinc-400 font-mono">Presets:</span>
             {presetQueries.map((pq, idx) => (
               <button
                 key={idx}
@@ -1435,7 +1435,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                   setSearchQuery(pq);
                   void executeSearch(pq);
                 }}
-                className="px-2.5 py-1 rounded-lg text-xs bg-[#070B14] hover:bg-slate-900 text-slate-200 border border-slate-800 truncate max-w-sm"
+                className="px-2.5 py-1 rounded-lg text-xs bg-[#09090B] hover:bg-zinc-900 text-zinc-200 border border-zinc-800 truncate max-w-sm"
               >
                 {pq}
               </button>
@@ -1460,16 +1460,16 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                   className={`p-4 lg:p-5 rounded-xl border border-l-4 transition-all ${
                     chunk.containsInjectionPattern
                       ? 'bg-amber-950/15 border-amber-500/40 border-l-amber-500'
-                      : 'bg-[#070B14] border-slate-800 border-l-emerald-500'
+                      : 'bg-[#09090B] border-zinc-800 border-l-emerald-500'
                   }`}
                 >
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800/80">
                       <div className="flex flex-wrap items-center gap-2">
                         <span className="px-2.5 py-1 rounded-md text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/35">
                           #{idx + 1} • Score {(chunk.score ?? 0).toFixed(3)}
                         </span>
-                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-900 text-slate-300 border border-slate-800">
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800">
                           chunk #{chunk.chunkIndex} • {chunk.tokenCount} tok
                         </span>
                         {chunk.containsInjectionPattern ? (
@@ -1493,7 +1493,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                               isShowingWrapped ? null : chunk.chunkId
                             )
                           }
-                          className="px-2.5 py-1 rounded-lg text-xs font-mono bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700"
+                          className="px-2.5 py-1 rounded-lg text-xs font-mono bg-zinc-900 hover:bg-zinc-800 text-zinc-200 border border-zinc-700"
                         >
                           {isShowingWrapped
                             ? 'Hide XML Envelope'
@@ -1506,7 +1506,7 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                               `Search knowledge base for ${searchQuery} and summarize with verified citations.`
                             )
                           }
-                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-300 border border-sky-500/30 flex items-center gap-1"
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold bg-zinc-100 hover:bg-white text-zinc-950 border border-zinc-200 flex items-center gap-1"
                         >
                           <span>Run Agent With Context</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -1552,13 +1552,13 @@ export const OrdarisRagKnowledgePanel: React.FC<OrdarisRagKnowledgePanelProps> =
                     <div>
                       <div className="flex justify-between text-zinc-300">
                         <span>Lexical (40%)</span>
-                        <span className="text-violet-300 font-semibold">
+                        <span className="text-zinc-100 font-semibold">
                           {(chunk.lexicalOverlapScore ?? 0).toFixed(3)}
                         </span>
                       </div>
                       <div className="h-2 bg-zinc-800 rounded-full mt-1.5 overflow-hidden">
                         <div
-                          className="h-full bg-violet-400"
+                          className="h-full bg-zinc-200"
                           style={{ width: `${lexPct}%` }}
                         />
                       </div>

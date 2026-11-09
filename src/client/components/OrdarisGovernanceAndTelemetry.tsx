@@ -778,15 +778,15 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
   return (
     <div className="space-y-6">
       {/* Top Sub-Tab Selector Bar */}
-      <div className="rounded-2xl border border-slate-800/90 bg-slate-900/75 p-3.5 flex flex-wrap xl:flex-nowrap items-center justify-between gap-2.5 shadow-xl">
+      <div className="rounded-2xl border border-zinc-800/90 bg-zinc-900/75 p-3.5 flex flex-wrap xl:flex-nowrap items-center justify-between gap-2.5 shadow-xl">
         <div className="flex flex-wrap xl:flex-nowrap items-center gap-2">
           <button
             type="button"
             onClick={() => setSubTab('evals')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               subTab === 'evals'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'bg-slate-950/80 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                ? 'bg-white text-zinc-950 shadow-sm'
+                : 'bg-zinc-950/80 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'
             }`}
           >
             <Award className="w-4 h-4 shrink-0" />
@@ -798,8 +798,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             onClick={() => setSubTab('finops')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               subTab === 'finops'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'bg-slate-950/80 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                ? 'bg-white text-zinc-950 shadow-sm'
+                : 'bg-zinc-950/80 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'
             }`}
           >
             <DollarSign className="w-4 h-4 shrink-0" />
@@ -811,8 +811,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             onClick={() => setSubTab('rbac')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               subTab === 'rbac'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'bg-slate-950/80 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                ? 'bg-white text-zinc-950 shadow-sm'
+                : 'bg-zinc-950/80 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'
             }`}
           >
             <Users className="w-4 h-4 shrink-0" />
@@ -824,8 +824,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             onClick={() => setSubTab('audit')}
             className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
               subTab === 'audit'
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                : 'bg-slate-950/80 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                ? 'bg-white text-zinc-950 shadow-sm'
+                : 'bg-zinc-950/80 text-zinc-300 hover:bg-zinc-800 border border-zinc-800'
             }`}
           >
             <ShieldCheck className="w-4 h-4 shrink-0" />
@@ -847,22 +847,22 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
       {/* SUB-TAB 4A: EVALUATIONS & REGRESSION GATE */}
       {subTab === 'evals' && (
-        <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-5 shadow-xl">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+        <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-zinc-200 bg-[#111113] p-5 space-y-5 shadow-xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-4">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Award className="w-5 h-5 text-indigo-400" />
+                <Award className="w-5 h-5 text-zinc-200" />
                 <span>Deterministic Evaluation Benchmark & Release SLA Gate</span>
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1">
                 Grades agent outputs against 3 deterministic graders (`contains`, `tool_called`, `citation_required`) before promoting snapshots to production.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
               {/* Target Engine Selector */}
-              <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5">
-                <span className="text-[11px] font-mono text-slate-400">Eval Engine:</span>
+              <div className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-lg px-2.5 py-1.5">
+                <span className="text-[11px] font-mono text-zinc-400">Eval Engine:</span>
                 <select
                   value={evalEngine}
                   onChange={(e) => {
@@ -880,29 +880,29 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                       setEvalEngine(nextEng);
                     }
                   }}
-                  className="bg-transparent text-xs font-mono text-indigo-300 focus:outline-none"
+                  className="bg-transparent text-xs font-mono text-zinc-100 focus:outline-none"
                 >
-                  <option value="gemini-free" className="bg-slate-900">
+                  <option value="gemini-free" className="bg-zinc-900">
                     gemini-free (Free • Always Available — Default)
                   </option>
-                  <option value="openrouter-free" className="bg-slate-900">
+                  <option value="openrouter-free" className="bg-zinc-900">
                     openrouter-free (Free • Always Available)
                   </option>
-                  <option value="chatgpt" className="bg-slate-900">
+                  <option value="chatgpt" className="bg-zinc-900">
                     chatgpt (OpenAI — No Longer Free •{' '}
                     {isEngineKeyConfigured('chatgpt', byokProviders)
                       ? '✓ Key Ready'
                       : 'Requires Key in BYOK Vault'}
                     )
                   </option>
-                  <option value="claude" className="bg-slate-900">
+                  <option value="claude" className="bg-zinc-900">
                     claude (Anthropic — No Longer Free •{' '}
                     {isEngineKeyConfigured('claude', byokProviders)
                       ? '✓ Key Ready'
                       : 'Requires Key in BYOK Vault'}
                     )
                   </option>
-                  <option value="grok" className="bg-slate-900">
+                  <option value="grok" className="bg-zinc-900">
                     grok (xAI — No Longer Free •{' '}
                     {isEngineKeyConfigured('grok', byokProviders)
                       ? '✓ Key Ready'
@@ -913,8 +913,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               </div>
 
               {/* SLA Gate Selector */}
-              <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 rounded-lg p-1 text-xs font-mono">
-                <span className="px-2 text-slate-400">SLA Gate:</span>
+              <div className="flex items-center gap-1.5 bg-zinc-950 border border-zinc-800 rounded-lg p-1 text-xs font-mono">
+                <span className="px-2 text-zinc-400">SLA Gate:</span>
                 {[75, 85, 95].map((pct) => (
                   <button
                     key={pct}
@@ -922,8 +922,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                     onClick={() => setSlaThreshold(pct)}
                     className={`px-2 py-1 rounded ${
                       slaThreshold === pct
-                        ? 'bg-indigo-600 text-white font-bold'
-                        : 'text-slate-400 hover:text-slate-200'
+                        ? 'bg-white text-zinc-950 font-bold'
+                        : 'text-zinc-400 hover:text-zinc-200'
                     }`}
                   >
                     {pct}%
@@ -942,12 +942,12 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               return (
                 <div
                   key={suite.id}
-                  className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#070B14] p-4 space-y-4"
+                  className="rounded-xl border border-zinc-800/90 border-l-4 border-l-emerald-500 bg-[#09090B] p-4 space-y-4"
                 >
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+                    <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800/80">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-slate-900 text-slate-300 border border-slate-800">
+                        <span className="px-2 py-0.5 rounded-md text-[11px] font-mono bg-zinc-900 text-zinc-300 border border-zinc-800">
                           {suite.caseCount} Golden Cases
                         </span>
                         {latest && (
@@ -963,7 +963,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                               : `✗ RELEASE GATE BLOCKED (${passPct}% < ${slaThreshold}%)`}
                           </span>
                         )}
-                        <span className="font-mono text-[11px] text-indigo-300">
+                        <span className="font-mono text-[11px] text-zinc-300">
                           [tool_called] • [citation_required] • [contains]
                         </span>
                       </div>
@@ -972,7 +972,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                         type="button"
                         disabled={runningSuiteId === suite.id}
                         onClick={() => handleRunEvalSuite(suite.id)}
-                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all"
+                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold transition-all"
                       >
                         {runningSuiteId === suite.id ? (
                           <span
@@ -992,19 +992,19 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   </div>
 
                   {latest?.caseResults && latest.caseResults.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2 border-t border-zinc-800/80">
                       {latest.caseResults.map((c, idx) => (
                         <div
                           key={c.caseId || idx}
                           className={`rounded-xl border border-l-4 ${
                             c.passed
-                              ? 'border-slate-800 border-l-emerald-500'
+                              ? 'border-zinc-800 border-l-emerald-500'
                               : 'border-rose-500/40 border-l-rose-500'
-                          } bg-[#0B111E] p-3.5 flex flex-col justify-between gap-2.5`}
+                          } bg-[#111113] p-3.5 flex flex-col justify-between gap-2.5`}
                         >
                           <div className="space-y-1.5">
-                            <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-800/80">
-                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-slate-900 text-indigo-300 border border-slate-800">
+                            <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-zinc-800/80">
+                              <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-zinc-900 text-zinc-200 border border-zinc-800">
                                 Golden Case #{idx + 1}
                               </span>
                               <span
@@ -1020,26 +1020,26 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             <div className="text-xs font-bold text-white">
                               {c.name || c.prompt || `Golden Assertion Case ${idx + 1}`}
                             </div>
-                            <div className="text-[11px] text-slate-400 font-mono">
+                            <div className="text-[11px] text-zinc-400 font-mono">
                               {c.details || c.reason || 'Verified tool invocation, grounded citation quote, and domain keywords.'}
                             </div>
                           </div>
 
-                          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800/60">
+                          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800/60">
                             <div className="flex items-center gap-1.5 flex-wrap">
                               {c.assertionType ? (
-                                <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[10px] font-mono text-emerald-300 border border-slate-800">
+                                <span className="px-1.5 py-0.5 rounded bg-zinc-950 text-[10px] font-mono text-emerald-300 border border-zinc-800">
                                   ✓ {c.assertionType}{c.expectedValue ? ` (${c.expectedValue})` : ''}
                                 </span>
                               ) : (
                                 <>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[10px] font-mono text-emerald-300 border border-slate-800">
+                                  <span className="px-1.5 py-0.5 rounded bg-zinc-950 text-[10px] font-mono text-emerald-300 border border-zinc-800">
                                     ✓ tool_called
                                   </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[10px] font-mono text-emerald-300 border border-slate-800">
+                                  <span className="px-1.5 py-0.5 rounded bg-zinc-950 text-[10px] font-mono text-emerald-300 border border-zinc-800">
                                     ✓ citation_required
                                   </span>
-                                  <span className="px-1.5 py-0.5 rounded bg-slate-950 text-[10px] font-mono text-emerald-300 border border-slate-800">
+                                  <span className="px-1.5 py-0.5 rounded bg-zinc-950 text-[10px] font-mono text-emerald-300 border border-zinc-800">
                                     ✓ contains
                                   </span>
                                 </>
@@ -1050,7 +1050,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                               <button
                                 type="button"
                                 onClick={() => onSelectRunToInspect(c.runId!)}
-                                className="text-[11px] font-mono text-indigo-400 hover:text-indigo-300"
+                                className="text-[11px] font-mono text-zinc-300 hover:text-white"
                               >
                                 Inspect Run Trace ➔
                               </button>
@@ -1072,19 +1072,19 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
         <div className="space-y-5">
           {/* Honest Usage Attribution Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-cyan-500 bg-[#0B111E] p-4 shadow-lg">
+            <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-cyan-500 bg-[#111113] p-4 shadow-lg">
               <div className="text-[11px] font-mono uppercase text-cyan-300">
                 Total Metered Runs
               </div>
               <div className="text-2xl font-bold text-white mt-1 font-mono">
                 {usageSummary.totalRuns}
               </div>
-              <div className="text-[11px] text-slate-400 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 Persisted in `usage_events` table
               </div>
             </div>
 
-            <div className="rounded-xl border border-emerald-500/30 border-l-4 border-l-emerald-500 bg-[#0B111E] p-4 shadow-lg">
+            <div className="rounded-xl border border-emerald-500/30 border-l-4 border-l-emerald-500 bg-[#111113] p-4 shadow-lg">
               <div className="text-[11px] font-mono uppercase text-emerald-300">
                 Live Cloud API Tokens (`live_api`)
               </div>
@@ -1096,41 +1096,41 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               </div>
             </div>
 
-            <div className="rounded-xl border border-indigo-500/30 border-l-4 border-l-indigo-500 bg-[#0B111E] p-4 shadow-lg">
-              <div className="text-[11px] font-mono uppercase text-indigo-300">
+            <div className="rounded-xl border border-zinc-700 border-l-4 border-l-zinc-200 bg-[#111113] p-4 shadow-lg">
+              <div className="text-[11px] font-mono uppercase text-zinc-200">
                 Simulation Tokens (`mock_estimate`)
               </div>
-              <div className="text-2xl font-bold text-indigo-300 mt-1 font-mono">
+              <div className="text-2xl font-bold text-white mt-1 font-mono">
                 {usageSummary.mockEstimateTokens.toLocaleString()}
               </div>
-              <div className="text-[11px] text-indigo-200/70 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 Zero-spend local deterministic engine
               </div>
             </div>
 
-            <div className="rounded-xl border border-amber-500/30 border-l-4 border-l-amber-500 bg-[#0B111E] p-4 shadow-lg">
+            <div className="rounded-xl border border-amber-500/30 border-l-4 border-l-amber-500 bg-[#111113] p-4 shadow-lg">
               <div className="text-[11px] font-mono uppercase text-amber-300">
                 Estimated Workspace Spend
               </div>
               <div className="text-2xl font-bold text-amber-300 mt-1 font-mono">
                 ${usageSummary.estimatedCostUsd}
               </div>
-              <div className="text-[11px] text-slate-400 mt-1">
+              <div className="text-[11px] text-zinc-400 mt-1">
                 Microdollar precision accounting
               </div>
             </div>
           </div>
 
           {/* Interactive What-If Enterprise Scale Calculator */}
-          <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-zinc-200 bg-[#111113] p-5 space-y-4 shadow-xl">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-zinc-800 pb-3">
               <div className="flex items-center gap-2">
-                <Sliders className="w-4 h-4 text-indigo-400" />
+                <Sliders className="w-4 h-4 text-zinc-200" />
                 <h3 className="text-sm font-bold text-white">
                   Interactive "What-If" Enterprise Monthly Scale Calculator
                 </h3>
               </div>
-              <span className="text-xs font-mono text-slate-400">
+              <span className="text-xs font-mono text-zinc-400">
                 Net Billable Volume:{' '}
                 <strong className="text-white">
                   {monthlyMillions.toFixed(2)}M tokens / month
@@ -1139,9 +1139,9 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-400">Daily Agent Runs:</span>
+                  <span className="text-zinc-400">Daily Agent Runs:</span>
                   <span className="font-mono font-bold text-white">
                     {dailyRunsScale.toLocaleString()} runs/day
                   </span>
@@ -1153,13 +1153,13 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   step={100}
                   value={dailyRunsScale}
                   onChange={(e) => setDailyRunsScale(Number(e.target.value))}
-                  className="w-full accent-indigo-500"
+                  className="w-full accent-white"
                 />
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-400">Avg Tokens / Run:</span>
+                  <span className="text-zinc-400">Avg Tokens / Run:</span>
                   <span className="font-mono font-bold text-white">
                     {avgTokensPerRun.toLocaleString()} tok
                   </span>
@@ -1171,13 +1171,13 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   step={200}
                   value={avgTokensPerRun}
                   onChange={(e) => setAvgTokensPerRun(Number(e.target.value))}
-                  className="w-full accent-indigo-500"
+                  className="w-full accent-white"
                 />
               </div>
 
-              <div className="p-3 rounded-lg bg-slate-950 border border-slate-800">
+              <div className="p-3 rounded-lg bg-zinc-950 border border-zinc-800">
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-400">Idempotency & RAG Cache Hit:</span>
+                  <span className="text-zinc-400">Idempotency & RAG Cache Hit:</span>
                   <span className="font-mono font-bold text-emerald-300">
                     {cacheHitRatePct}% saved
                   </span>
@@ -1219,17 +1219,17 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               ].map((tier) => (
                 <div
                   key={tier.name}
-                  className="p-3 rounded-lg bg-slate-950/90 border border-slate-800 flex flex-col justify-between"
+                  className="p-3 rounded-lg bg-zinc-950/90 border border-zinc-800 flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between gap-1">
                     <span className="text-xs font-bold text-white">{tier.name}</span>
-                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300">
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700">
                       {tier.badge}
                     </span>
                   </div>
                   <div className="text-lg font-mono font-bold text-emerald-300 mt-2">
                     ${(monthlyMillions * tier.ratePerMillion).toFixed(2)}{' '}
-                    <span className="text-[11px] font-normal text-slate-400">/ mo</span>
+                    <span className="text-[11px] font-normal text-zinc-400">/ mo</span>
                   </div>
                 </div>
               ))}
@@ -1238,19 +1238,19 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
           {/* Usage Events Ledger Table */}
           {usageSummary.events && usageSummary.events.length > 0 && (
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 space-y-3">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                <div className="text-xs font-bold uppercase tracking-wider text-zinc-300">
                   Recent Metered `usage_events` Ledger ({usageSummary.events.length})
                 </div>
-                <span className="text-[11px] font-mono text-slate-400">
+                <span className="text-[11px] font-mono text-zinc-400">
                   Cumulative Spend: <strong className="text-amber-300">${usageSummary.estimatedCostUsd}</strong>
                 </span>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead>
-                    <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400">
+                    <tr className="border-b border-zinc-800 text-[11px] font-mono text-zinc-400">
                       <th className="py-2 pr-3">Timestamp</th>
                       <th className="py-2 px-3">Provider / Model</th>
                       <th className="py-2 px-3">Source Attribution</th>
@@ -1261,34 +1261,34 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                       <th className="py-2 pl-3 text-right">Trace</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-800/60 font-mono">
+                  <tbody className="divide-y divide-zinc-800/60 font-mono">
                     {usageSummary.events.slice(0, 15).map((ev) => (
-                      <tr key={ev.id} className="text-slate-300 hover:bg-slate-800/30">
-                        <td className="py-2 pr-3 text-[11px] text-slate-400 whitespace-nowrap">
+                      <tr key={ev.id} className="text-zinc-300 hover:bg-zinc-800/30">
+                        <td className="py-2 pr-3 text-[11px] text-zinc-400 whitespace-nowrap">
                           {new Date(ev.createdAt).toLocaleTimeString()}
                         </td>
                         <td className="py-2 px-3">
                           <span className="text-white font-semibold">{ev.provider}</span>{' '}
-                          <span className="text-slate-500">({ev.model})</span>
+                          <span className="text-zinc-500">({ev.model})</span>
                         </td>
                         <td className="py-2 px-3">
                           <span
                             className={`px-1.5 py-0.5 rounded text-[10px] ${
                               ev.usageSource === 'live_api'
                                 ? 'bg-emerald-500/20 text-emerald-300'
-                                : 'bg-indigo-500/20 text-indigo-300'
+                                : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
                             }`}
                           >
                             {ev.usageSource}
                           </span>
                         </td>
-                        <td className="py-2 px-3 text-slate-400">
+                        <td className="py-2 px-3 text-zinc-400">
                           {ev.promptTokens} / {ev.completionTokens}
                         </td>
                         <td className="py-2 px-3 text-white font-bold">
                           {ev.totalTokens}
                         </td>
-                        <td className="py-2 px-3 text-indigo-300">
+                        <td className="py-2 px-3 text-zinc-200">
                           {ev.toolCallsCount ?? 0}
                         </td>
                         <td className="py-2 px-3 text-right text-amber-300 font-bold">
@@ -1299,12 +1299,12 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             <button
                               type="button"
                               onClick={() => onSelectRunToInspect(ev.runId!)}
-                              className="text-[11px] text-indigo-400 hover:text-indigo-300"
+                              className="text-[11px] text-zinc-300 hover:text-white"
                             >
                               Inspect Run ➔
                             </button>
                           ) : (
-                            <span className="text-slate-600">—</span>
+                            <span className="text-zinc-600">—</span>
                           )}
                         </td>
                       </tr>
@@ -1320,14 +1320,14 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
       {/* SUB-TAB 4C: TEAM & RBAC MEMBERSHIP + 28-ACTION POLICY MATRIX */}
       {subTab === 'rbac' && (
         <div className="space-y-5">
-          <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3.5">
               <div>
                 <h3 className="text-base font-bold text-white flex items-center gap-2">
-                  <Users className="w-5 h-5 text-indigo-400" />
+                  <Users className="w-5 h-5 text-zinc-200" />
                   <span>Tenant Team & RBAC Membership Governance ({activeOrgName})</span>
                 </h3>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-zinc-400 mt-1">
                   Enforces strict role boundaries (`Owner`, `Admin`, `Developer`, `Viewer`) and prevents orphaning an organization via the **Last-Owner `409 Conflict` Safeguard**.
                 </p>
               </div>
@@ -1336,7 +1336,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                 <button
                   type="button"
                   onClick={() => setShowPolicyMatrixModal(true)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 border border-indigo-500/30 text-indigo-300 text-xs font-bold transition-all"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold transition-all"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   <span>Inspect 28-Action RBAC Policy Matrix</span>
@@ -1346,8 +1346,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
             {/* 1-Click Governance Boundary Tests */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="p-4 rounded-xl bg-[#070B14] border border-slate-800 border-l-4 border-l-amber-500 space-y-2">
-                <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+              <div className="p-4 rounded-xl bg-[#09090B] border border-zinc-800 border-l-4 border-l-amber-500 space-y-2">
+                <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/35">
                     Boundary Test 1 • HTTP 403
                   </span>
@@ -1374,13 +1374,13 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                 <div className="text-xs font-bold text-white">
                   Privilege Escalation Guard (`403 Forbidden`)
                 </div>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-zinc-400">
                   Simulates a non-owner (`Admin` / `{activeActorRole === 'owner' ? 'admin' : activeActorRole}`) attempting to grant `owner` privileges. Only `Owner` can assign `Owner`.
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#070B14] border border-slate-800 border-l-4 border-l-rose-500 space-y-2">
-                <div className="flex items-center justify-between gap-2 pb-2 border-b border-slate-800/80">
+              <div className="p-4 rounded-xl bg-[#09090B] border border-zinc-800 border-l-4 border-l-rose-500 space-y-2">
+                <div className="flex items-center justify-between gap-2 pb-2 border-b border-zinc-800/80">
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-rose-500/20 text-rose-300 border border-rose-500/35">
                     Boundary Test 2 • HTTP 409
                   </span>
@@ -1409,38 +1409,38 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                 <div className="text-xs font-bold text-white">
                   Last-Owner Demotion Safeguard (`409 Conflict`)
                 </div>
-                <p className="text-[11px] text-slate-400">
+                <p className="text-[11px] text-zinc-400">
                   Attempts to remove the primary organization `Owner` as `Owner`, proving the server blocks tenant lock-out with `HTTP 409 LAST_OWNER_PROTECTED`.
                 </p>
               </div>
             </div>
 
             {/* Invite / Upsert Member Form */}
-            <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
+            <div className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-4 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1">
                   Member Email
                 </label>
                 <input
                   type="email"
                   value={newMemberEmail}
                   onChange={(e) => setNewMemberEmail(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1">
                   Display Name
                 </label>
                 <input
                   type="text"
                   value={newMemberName}
                   onChange={(e) => setNewMemberName(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">
+                <label className="block text-[11px] font-mono text-zinc-400 mb-1">
                   Assigned RBAC Role
                 </label>
                 <select
@@ -1450,7 +1450,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                       e.target.value as 'owner' | 'admin' | 'developer' | 'viewer',
                     )
                   }
-                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
+                  className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white font-mono"
                 >
                   <option value="developer">developer (18/28 perms)</option>
                   <option value="viewer">viewer (9/28 perms)</option>
@@ -1462,7 +1462,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                 type="button"
                 disabled={savingMember || !newMemberEmail.trim()}
                 onClick={() => handleUpsertMember()}
-                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-bold transition-all"
+                className="inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-50 text-zinc-950 text-xs font-bold transition-all"
               >
                 {savingMember ? (
                   <span
@@ -1480,14 +1480,14 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead>
-                  <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400">
+                  <tr className="border-b border-zinc-800 text-[11px] font-mono text-zinc-400">
                     <th className="py-2 pr-3">Member</th>
                     <th className="py-2 px-3">Email</th>
                     <th className="py-2 px-3">RBAC Role &amp; Permissions</th>
                     <th className="py-2 pl-3 text-right">Governance Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-zinc-800/60">
                   {members.map((m) => {
                     const permCount =
                       m.role === 'owner'
@@ -1498,7 +1498,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             ? '18/28'
                             : '9/28';
                     return (
-                      <tr key={m.userId} className="text-slate-200 hover:bg-slate-800/30">
+                      <tr key={m.userId} className="text-zinc-200 hover:bg-zinc-800/30">
                         <td className="py-2.5 pr-3 font-semibold text-white">
                           <div className="flex items-center gap-2">
                             <span>{m.displayName}</span>
@@ -1509,7 +1509,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             )}
                           </div>
                         </td>
-                        <td className="py-2.5 px-3 font-mono text-slate-400">
+                        <td className="py-2.5 px-3 font-mono text-zinc-400">
                           {m.email}
                         </td>
                         <td className="py-2.5 px-3">
@@ -1519,15 +1519,15 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                 m.role === 'owner'
                                   ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                                   : m.role === 'admin'
-                                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                                    ? 'bg-zinc-100 text-zinc-950 border border-white'
                                     : m.role === 'developer'
                                       ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                                      : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                      : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
                               }`}
                             >
                               {m.role}
                             </span>
-                            <span className="text-[10px] font-mono text-slate-500">
+                            <span className="text-[10px] font-mono text-zinc-500">
                               ({permCount} perms)
                             </span>
                           </div>
@@ -1541,7 +1541,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                 setNewMemberName(m.displayName);
                                 setNewMemberRole(m.role);
                               }}
-                              className="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[11px] font-mono text-indigo-300"
+                              className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-[11px] font-mono text-zinc-200"
                             >
                               Load into Form
                             </button>
@@ -1567,14 +1567,14 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
       {/* SUB-TAB 4D: APPEND-ONLY SECURITY AUDIT LEDGER */}
       {subTab === 'audit' && (
-        <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3.5">
             <div>
               <h3 className="text-base font-bold text-white flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 <span>Append-Only Security Audit Ledger &amp; Full Action Forensics</span>
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-zinc-400 mt-1">
                 Captures every `allowed` mutation and every `403` / `404` / `409` / `422` `denied` security event with full action narratives, structured `metadata_json`, and deterministic SHA-256 event seals.
               </p>
             </div>
@@ -1585,8 +1585,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                 onClick={() => setExpandAllAuditDetails((prev) => !prev)}
                 className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-mono transition-all ${
                   expandAllAuditDetails
-                    ? 'bg-indigo-600/25 border-indigo-500/50 text-indigo-200 font-bold'
-                    : 'bg-slate-950 hover:bg-slate-800 border-slate-700 text-slate-200'
+                    ? 'bg-white border-white text-zinc-950 font-bold'
+                    : 'bg-zinc-950 hover:bg-zinc-800 border-zinc-700 text-zinc-200'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -1599,7 +1599,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               <button
                 type="button"
                 onClick={() => handleExportAudit('json')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Export JSON</span>
@@ -1607,7 +1607,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               <button
                 type="button"
                 onClick={() => handleExportAudit('csv')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono"
               >
                 <FileSpreadsheet className="w-3.5 h-3.5" />
                 <span>Export CSV</span>
@@ -1625,8 +1625,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                     Zero-Trust RBAC Guard: `audit.view` Restricted to `Owner` &amp; `Admin` Roles
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-300 mt-1">
-                  Active role <strong className="font-mono uppercase text-white">{activeActorRole}</strong> does not hold `audit.view` permission. Switch to <strong className="text-emerald-300">Owner</strong> or <strong className="text-indigo-300">Admin</strong> in the top persona selector to inspect all {activeOrgName} audit events, or click below to test the live `403 Forbidden` boundary.
+                <p className="text-[11px] text-zinc-300 mt-1">
+                  Active role <strong className="font-mono uppercase text-white">{activeActorRole}</strong> does not hold `audit.view` permission. Switch to <strong className="text-emerald-300">Owner</strong> or <strong className="text-zinc-100">Admin</strong> in the top persona selector to inspect all {activeOrgName} audit events, or click below to test the live `403 Forbidden` boundary.
                 </p>
               </div>
               <button
@@ -1649,7 +1649,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
           {/* Filter & Search Bar */}
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs font-mono">
+            <div className="inline-flex rounded-lg bg-zinc-950 p-1 border border-zinc-800 text-xs font-mono">
               {(['all', 'allowed', 'denied'] as const).map((f) => (
                 <button
                   key={f}
@@ -1659,8 +1659,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                     auditOutcomeFilter === f
                       ? f === 'denied'
                         ? 'bg-rose-500/20 text-rose-300 font-bold'
-                        : 'bg-indigo-600 text-white font-bold'
-                      : 'text-slate-400 hover:text-slate-200'
+                        : 'bg-white text-zinc-950 font-bold'
+                      : 'text-zinc-400 hover:text-zinc-200'
                   }`}
                 >
                   {f} (
@@ -1673,13 +1673,13 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             </div>
 
             <div className="relative flex-1 max-w-md">
-              <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+              <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
               <input
                 type="text"
                 value={auditSearch}
                 onChange={(e) => setAuditSearch(e.target.value)}
                 placeholder="Search action, actor, narrative, or metadata..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-zinc-200"
               />
             </div>
           </div>
@@ -1687,7 +1687,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400">
+                <tr className="border-b border-zinc-800 text-[11px] font-mono text-zinc-400">
                   <th className="py-2 pr-3">Timestamp</th>
                   <th className="py-2 px-3">Actor &amp; Role</th>
                   <th className="py-2 px-3">Action &amp; Target</th>
@@ -1696,10 +1696,10 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   <th className="py-2 pl-3 text-right">Integrity Seal &amp; Forensics</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60 font-mono">
+              <tbody className="divide-y divide-zinc-800/60 font-mono">
                 {filteredAuditEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="py-8 text-center text-slate-400 font-sans">
+                    <td colSpan={6} className="py-8 text-center text-zinc-400 font-sans">
                       {activeActorRole !== 'owner' && activeActorRole !== 'admin'
                         ? `Audit Ledger hidden for role "${activeActorRole.toUpperCase()}" (requires audit.view permission).`
                         : 'No audit events match the active filter.'}
@@ -1716,10 +1716,10 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
                     return (
                       <React.Fragment key={evt.id}>
-                        <tr className="text-slate-300 hover:bg-slate-800/35 align-top">
-                          <td className="py-3 pr-3 text-[11px] text-slate-400 whitespace-nowrap">
+                        <tr className="text-zinc-300 hover:bg-zinc-800/35 align-top">
+                          <td className="py-3 pr-3 text-[11px] text-zinc-400 whitespace-nowrap">
                             <div>{new Date(evt.createdAt).toLocaleTimeString()}</div>
-                            <div className="text-[10px] text-slate-500">
+                            <div className="text-[10px] text-zinc-500">
                               {new Date(evt.createdAt).toLocaleDateString()}
                             </div>
                           </td>
@@ -1730,20 +1730,20 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                   evt.actorRole === 'owner'
                                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
                                     : evt.actorRole === 'admin'
-                                      ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
+                                      ? 'bg-zinc-100 text-zinc-950 border border-white'
                                       : evt.actorRole === 'developer'
                                         ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                                        : 'bg-slate-800 text-slate-200 border border-slate-700'
+                                        : 'bg-zinc-800 text-zinc-200 border border-zinc-700'
                                 }`}
                               >
                                 {evt.actorRole || 'system'}
                               </span>
                             </div>
-                            <div className="text-[11px] font-sans font-medium text-slate-200 mt-1">
+                            <div className="text-[11px] font-sans font-medium text-zinc-200 mt-1">
                               {desc.actorDisplayName}
                             </div>
                             {desc.actorEmail && (
-                              <div className="text-[10px] text-slate-500">
+                              <div className="text-[10px] text-zinc-500">
                                 {desc.actorEmail}
                               </div>
                             )}
@@ -1752,18 +1752,18 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             <div className="font-sans font-bold text-white text-xs">
                               {desc.title}
                             </div>
-                            <div className="text-[11px] text-indigo-300 mt-0.5">
+                            <div className="text-[11px] text-zinc-200 mt-0.5">
                               {evt.action}
                             </div>
-                            <div className="text-[10px] text-slate-400 mt-0.5">
+                            <div className="text-[10px] text-zinc-400 mt-0.5">
                               {desc.targetResourceType}:{' '}
-                              <span className="text-slate-300">
+                              <span className="text-zinc-300">
                                 {desc.targetResourceId.slice(0, 18)}
                               </span>
                             </div>
                           </td>
                           <td className="py-3 px-3 max-w-md font-sans">
-                            <p className="text-xs text-slate-200 leading-relaxed">
+                            <p className="text-xs text-zinc-200 leading-relaxed">
                               {desc.whatHappened}
                             </p>
                             {desc.badges.length > 0 && (
@@ -1771,10 +1771,10 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                 {desc.badges.map((b, bIdx) => (
                                   <span
                                     key={`${evt.id}-b-${bIdx}`}
-                                    className="px-1.5 py-0.5 rounded bg-slate-950 border border-slate-800 text-[10px] text-slate-300"
+                                    className="px-1.5 py-0.5 rounded bg-zinc-950 border border-zinc-800 text-[10px] text-zinc-300"
                                   >
-                                    <span className="text-slate-500">{b.label}:</span>{' '}
-                                    <span className="text-indigo-200">{b.value}</span>
+                                    <span className="text-zinc-500">{b.label}:</span>{' '}
+                                    <span className="text-zinc-100">{b.value}</span>
                                   </span>
                                 ))}
                               </div>
@@ -1786,7 +1786,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                   onClick={() =>
                                     onSelectRunToInspect(desc.linkedRunId!)
                                   }
-                                  className="text-[11px] text-indigo-400 hover:text-indigo-300 font-bold"
+                                  className="text-[11px] text-zinc-200 hover:text-white font-bold"
                                 >
                                   Inspect Linked Run Trace ({desc.linkedRunId.slice(0, 8)}) ➔
                                 </button>
@@ -1805,7 +1805,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                             </span>
                           </td>
                           <td className="py-3 pl-3 text-right whitespace-nowrap">
-                            <div className="text-[11px] text-indigo-300/80">
+                            <div className="text-[11px] text-zinc-300">
                               {seal}
                             </div>
                             <button
@@ -1816,7 +1816,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                   [evt.id]: !prev[evt.id],
                                 }))
                               }
-                              className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-950 hover:bg-slate-800 border border-slate-700 text-[10px] text-slate-200"
+                              className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-200"
                             >
                               <span>
                                 {isExpanded ? 'Hide Record ▴' : 'Full Record ▾'}
@@ -1825,24 +1825,24 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                           </td>
                         </tr>
                         {isExpanded && (
-                          <tr className="bg-slate-950/90 border-b border-slate-800">
+                          <tr className="bg-zinc-950/90 border-b border-zinc-800">
                             <td colSpan={6} className="p-3.5">
                               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 text-[11px] font-mono">
-                                <div className="space-y-1.5 bg-slate-900/80 border border-slate-800 rounded-lg p-3">
+                                <div className="space-y-1.5 bg-zinc-900/80 border border-zinc-800 rounded-lg p-3">
                                   <div className="text-xs font-bold text-white mb-1">
                                     Immutable Audit Envelope
                                   </div>
                                   <div>
-                                    <span className="text-slate-500">Event ID:</span>{' '}
-                                    <span className="text-slate-200">{evt.id}</span>
+                                    <span className="text-zinc-500">Event ID:</span>{' '}
+                                    <span className="text-zinc-200">{evt.id}</span>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500">Timestamp (ISO):</span>{' '}
-                                    <span className="text-slate-200">{evt.createdAt}</span>
+                                    <span className="text-zinc-500">Timestamp (ISO):</span>{' '}
+                                    <span className="text-zinc-200">{evt.createdAt}</span>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500">Actor Identity:</span>{' '}
-                                    <span className="text-slate-200">
+                                    <span className="text-zinc-500">Actor Identity:</span>{' '}
+                                    <span className="text-zinc-200">
                                       {desc.actorDisplayName}
                                       {desc.actorEmail ? ` <${desc.actorEmail}>` : ''}{' '}
                                       (Role: {(evt.actorRole || 'system').toUpperCase()} • UserID:{' '}
@@ -1850,17 +1850,17 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500">Target Resource:</span>{' '}
-                                    <span className="text-indigo-300">
+                                    <span className="text-zinc-500">Target Resource:</span>{' '}
+                                    <span className="text-zinc-200">
                                       {desc.targetResourceType} / {desc.targetResourceId}
                                     </span>
                                   </div>
                                   <div>
-                                    <span className="text-slate-500">Cryptographic Seal:</span>{' '}
+                                    <span className="text-zinc-500">Cryptographic Seal:</span>{' '}
                                     <span className="text-emerald-300">{seal}</span>
                                   </div>
                                 </div>
-                                <div className="space-y-1.5 bg-slate-900/80 border border-slate-800 rounded-lg p-3">
+                                <div className="space-y-1.5 bg-zinc-900/80 border border-zinc-800 rounded-lg p-3">
                                   <div className="text-xs font-bold text-white mb-1">
                                     Structured `metadata_json` Payload
                                   </div>
@@ -1896,22 +1896,22 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
       {/* MODAL 1: 28-Action RBAC Policy Matrix */}
       {showPolicyMatrixModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl">
+            <div className="p-4 border-b border-zinc-800 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white">
                   Ordaris 28-Action Enterprise RBAC Policy Matrix
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   Enforced centrally by `src/server/policies/authorization.ts` across all HTTP routes. Active Role:{' '}
-                  <strong className="text-indigo-300 uppercase font-mono">{activeActorRole}</strong>
+                  <strong className="text-white uppercase font-mono">{activeActorRole}</strong>
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowPolicyMatrixModal(false)}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1919,13 +1919,13 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
             <div className="p-4 overflow-y-auto">
               <table className="w-full text-left text-xs font-mono">
                 <thead>
-                  <tr className="border-b border-slate-800 text-slate-400">
+                  <tr className="border-b border-zinc-800 text-zinc-400">
                     <th className="py-2">Permission Action</th>
                     <th className="py-2">Domain</th>
                     <th className={`py-2 text-center ${activeActorRole === 'owner' ? 'text-amber-300 font-bold' : ''}`}>
                       Owner (28/28)
                     </th>
-                    <th className={`py-2 text-center ${activeActorRole === 'admin' ? 'text-indigo-300 font-bold' : ''}`}>
+                    <th className={`py-2 text-center ${activeActorRole === 'admin' ? 'text-white font-bold' : ''}`}>
                       Admin (26/28)
                     </th>
                     <th className={`py-2 text-center ${activeActorRole === 'developer' ? 'text-emerald-300 font-bold' : ''}`}>
@@ -1936,11 +1936,11 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-zinc-800/60">
                   {RBAC_28_ACTIONS.map((row) => (
-                    <tr key={row.action} className="text-slate-200 hover:bg-slate-800/30">
-                      <td className="py-1.5 font-bold text-indigo-300">{row.action}</td>
-                      <td className="py-1.5 text-slate-400">{row.category}</td>
+                    <tr key={row.action} className="text-zinc-200 hover:bg-zinc-800/30">
+                      <td className="py-1.5 font-bold text-zinc-100">{row.action}</td>
+                      <td className="py-1.5 text-zinc-400">{row.category}</td>
                       <td className={`py-1.5 text-center ${row.owner ? 'text-emerald-400 font-bold' : 'text-rose-400/70'}`}>
                         {row.owner ? '✓' : '✗'}
                       </td>
@@ -1964,16 +1964,16 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
 
       {/* MODAL 2: Live 4-Point Cross-Tenant Isolation Verifier */}
       {showIsolationModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-2xl w-full p-5 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-2xl w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 <div>
                   <h3 className="text-sm font-bold text-white">
                     Live 4-Point Cross-Tenant Isolation Verifier (`Acme Cyber Defense` ⇄ `Beta Logistics`)
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-zinc-400">
                     Executes live server-side probes to prove ADR-002 404 Cross-Tenant Masking & Tenant FK isolation.
                   </p>
                 </div>
@@ -1981,14 +1981,14 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
               <button
                 type="button"
                 onClick={() => setShowIsolationModal(false)}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {verifyingIsolation ? (
-              <div className="py-8 text-center text-xs font-mono text-slate-300">
+              <div className="py-8 text-center text-xs font-mono text-zinc-300">
                 Executing 4 cross-tenant security probes against PGlite / PostgreSQL...
               </div>
             ) : isolationReport ? (
@@ -1997,7 +1997,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   <span className="font-bold text-emerald-300">
                     ✓ ALL {isolationReport.passedChecks}/{isolationReport.totalChecks} ISOLATION INVARIANTS VERIFIED
                   </span>
-                  <span className="font-mono text-slate-400">
+                  <span className="font-mono text-zinc-400">
                     {new Date(isolationReport.verifiedAt).toLocaleTimeString()}
                   </span>
                 </div>
@@ -2006,7 +2006,7 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                   {isolationReport.checks.map((chk) => (
                     <div
                       key={chk.id}
-                      className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1"
+                      className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 space-y-1"
                     >
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-white">
@@ -2016,8 +2016,8 @@ export const OrdarisGovernanceAndFinopsPanel: React.FC<OrdarisGovernanceAndFinop
                           HTTP {chk.actualStatus} (Expected {chk.expectedStatus})
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400">{chk.description}</p>
-                      <div className="text-[11px] font-mono text-indigo-300">
+                      <p className="text-[11px] text-zinc-400">{chk.description}</p>
+                      <div className="text-[11px] font-mono text-zinc-200">
                         Proof: {chk.evidence}
                       </div>
                     </div>
@@ -2289,17 +2289,17 @@ XAI_API_KEY=`;
   return (
     <div className="space-y-6">
       {/* Part 1: 3-Tier AI Engine Resolution Matrix */}
-      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-indigo-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+      <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-zinc-200 bg-[#111113] p-5 space-y-4 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3.5">
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-indigo-400" />
+              <Cpu className="w-5 h-5 text-zinc-200" />
               <span>3-Tier AI Engine Resolution Matrix &amp; Session Isolation</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-100 text-zinc-950 font-bold border border-white">
                 Active: {selectedEngine}
               </span>
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               <code className="text-emerald-300">gemini-free</code> and{' '}
               <code className="text-emerald-300">openrouter-free</code> are always free (with{' '}
               <code className="text-emerald-300">gemini-free</code> as default fallback).{' '}
@@ -2314,11 +2314,11 @@ XAI_API_KEY=`;
               onClick={() => onSelectEngine('auto')}
               className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border text-xs font-mono transition ${
                 selectedEngine === 'auto'
-                  ? 'bg-indigo-600 border-indigo-400 text-white font-bold'
-                  : 'bg-slate-950 hover:bg-slate-800 border-slate-700 text-slate-200'
+                  ? 'bg-white border-white text-zinc-950 font-bold'
+                  : 'bg-zinc-950 hover:bg-zinc-800 border-zinc-700 text-zinc-200'
               }`}
             >
-              <Cpu className="w-3.5 h-3.5 text-indigo-300" />
+              <Cpu className="w-3.5 h-3.5" />
               <span>
                 {selectedEngine === 'auto'
                   ? '✓ Auto Smart Router (Default: gemini-free)'
@@ -2329,16 +2329,16 @@ XAI_API_KEY=`;
             <button
               type="button"
               onClick={() => setShowEnvModal(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono"
             >
-              <Terminal className="w-3.5 h-3.5 text-indigo-400" />
+              <Terminal className="w-3.5 h-3.5 text-zinc-300" />
               <span>Local `.env` &amp; `pnpm` Quickstart</span>
             </button>
 
             <button
               type="button"
               onClick={onOpenByokDrawer}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white hover:bg-zinc-200 text-zinc-950 text-xs font-bold shadow-sm"
             >
               <Key className="w-3.5 h-3.5" />
               <span>Open Session BYOK Key Vault ({sessionVaultCount}/5)</span>
@@ -2348,40 +2348,40 @@ XAI_API_KEY=`;
 
         {/* 3-Tier Architecture Summary Strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-          <div className="p-3.5 rounded-xl bg-[#070B14] border border-emerald-500/30 border-l-4 border-l-emerald-500">
-            <div className="flex items-center justify-between font-bold text-emerald-300 pb-2 mb-1.5 border-b border-slate-800/80">
+          <div className="p-3.5 rounded-xl bg-[#09090B] border border-emerald-500/30 border-l-4 border-l-emerald-500">
+            <div className="flex items-center justify-between font-bold text-emerald-300 pb-2 mb-1.5 border-b border-zinc-800/80">
               <span>Tier 1: Session BYOK Vault (RAM)</span>
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-emerald-500/20">
                 {sessionVaultCount} configured
               </span>
             </div>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-zinc-300">
               AES-256-GCM encrypted in server memory under session scope{' '}
               <code className="text-emerald-200 font-mono">{sessionId.slice(0, 14)}…</code> with a 2-hour sliding TTL.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#070B14] border border-indigo-500/30 border-l-4 border-l-indigo-500">
-            <div className="flex items-center justify-between font-bold text-indigo-300 pb-2 mb-1.5 border-b border-slate-800/80">
+          <div className="p-3.5 rounded-xl bg-[#09090B] border border-zinc-700 border-l-4 border-l-zinc-200">
+            <div className="flex items-center justify-between font-bold text-zinc-100 pb-2 mb-1.5 border-b border-zinc-800/80">
               <span>Tier 2: Free &amp; Server `.env` Engines</span>
-              <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-indigo-500/20">
+              <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-zinc-800 text-zinc-200">
                 2 Always Free{serverEnvCount > 0 ? ` • ${serverEnvCount} .env` : ''}
               </span>
             </div>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-zinc-300">
               <code className="text-emerald-300 font-mono">gemini-free</code> (Gemini 3 Flash, default fallback) &amp;{' '}
               <code className="text-emerald-300 font-mono">openrouter-free</code> (Llama 3.3 70B) work out-of-the-box.
             </p>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-[#070B14] border border-amber-500/30 border-l-4 border-l-amber-500">
-            <div className="flex items-center justify-between font-bold text-amber-300 pb-2 mb-1.5 border-b border-slate-800/80">
+          <div className="p-3.5 rounded-xl bg-[#09090B] border border-amber-500/30 border-l-4 border-l-amber-500">
+            <div className="flex items-center justify-between font-bold text-amber-300 pb-2 mb-1.5 border-b border-zinc-800/80">
               <span>Paid BYOK Gate (No Longer Free)</span>
               <span className="font-mono text-[11px] px-2 py-0.5 rounded bg-amber-500/20">
                 ChatGPT • Claude • Grok
               </span>
             </div>
-            <p className="text-[11px] text-slate-300">
+            <p className="text-[11px] text-zinc-300">
               Requires <code className="text-amber-200 font-mono">OPENAI_API_KEY</code>,{' '}
               <code className="text-amber-200 font-mono">ANTHROPIC_API_KEY</code>, or{' '}
               <code className="text-amber-200 font-mono">XAI_API_KEY</code> in your Session BYOK Vault.
@@ -2392,7 +2392,7 @@ XAI_API_KEY=`;
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="border-b border-slate-800 text-[11px] font-mono text-slate-400">
+              <tr className="border-b border-zinc-800 text-[11px] font-mono text-zinc-400">
                 <th className="py-2 pr-3">Engine ID &amp; Model</th>
                 <th className="py-2 px-3">Tier 1: Session BYOK Vault</th>
                 <th className="py-2 px-3">Tier 2: Server `.env` Key</th>
@@ -2401,7 +2401,7 @@ XAI_API_KEY=`;
                 <th className="py-2 pl-3 text-right">Probe &amp; Selection</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 font-mono">
+            <tbody className="divide-y divide-zinc-800/60 font-mono">
               {providers.map((p) => {
                 const isAlwaysAvailable =
                   p.provider === 'gemini' || p.provider === 'openrouter';
@@ -2430,7 +2430,7 @@ XAI_API_KEY=`;
                         : null;
 
                 return (
-                  <tr key={p.provider} className="text-slate-200 align-top">
+                  <tr key={p.provider} className="text-zinc-200 align-top">
                     <td className="py-3 pr-3">
                       <div className="font-bold text-white flex items-center gap-1.5">
                         <span>{p.label}</span>
@@ -2440,7 +2440,7 @@ XAI_API_KEY=`;
                           </span>
                         )}
                       </div>
-                      <div className="text-[11px] text-slate-400">
+                      <div className="text-[11px] text-zinc-400">
                         {engineId} • {p.modelName}
                       </div>
                       {verifyMsg && (
@@ -2469,7 +2469,7 @@ XAI_API_KEY=`;
                           ) : null}
                         </div>
                       ) : (
-                        <span className="text-slate-500 text-[11px]">Not set in session</span>
+                        <span className="text-zinc-500 text-[11px]">Not set in session</span>
                       )}
                     </td>
                     <td className="py-3 px-3">
@@ -2482,14 +2482,14 @@ XAI_API_KEY=`;
                           ✓ {p.envVarName}
                         </span>
                       ) : (
-                        <span className="text-indigo-300/90 text-[11px]">
+                        <span className="text-zinc-300 text-[11px]">
                           Built-In Free ({p.envVarName} optional)
                         </span>
                       )}
                     </td>
                     <td className="py-3 px-3">
                       {isAlwaysAvailable ? (
-                        <span className="px-2 py-0.5 rounded bg-indigo-500/15 text-indigo-300 text-[10px]">
+                        <span className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 border border-zinc-700 text-[10px]">
                           {p.provider === 'gemini'
                             ? 'Free • Always Available (Default Fallback)'
                             : 'Free • Always Available (Fallback: gemini-free)'}
@@ -2512,7 +2512,7 @@ XAI_API_KEY=`;
                             : hasServerEnvKey
                               ? 'bg-sky-500/20 text-sky-300'
                               : isAlwaysAvailable
-                                ? 'bg-indigo-500/20 text-indigo-300'
+                                ? 'bg-zinc-800 text-zinc-200 border border-zinc-700'
                                 : 'bg-amber-500/20 text-amber-300'
                         }`}
                       >
@@ -2531,7 +2531,7 @@ XAI_API_KEY=`;
                           type="button"
                           disabled={isProbing}
                           onClick={() => handleProbeEngineConnection(p.provider)}
-                          className="px-2 py-1 rounded bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-300 text-[10px] font-mono inline-flex items-center gap-1.5"
+                          className="px-2 py-1 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-mono inline-flex items-center gap-1.5"
                         >
                           {isProbing ? (
                             <span
@@ -2548,9 +2548,9 @@ XAI_API_KEY=`;
                           onClick={() => onSelectEngine(engineId)}
                           className={`px-2.5 py-1 rounded text-[11px] font-bold ${
                             isSelected
-                              ? 'bg-indigo-600 text-white'
+                              ? 'bg-white text-zinc-950'
                               : isReady
-                                ? 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                                ? 'bg-zinc-800 hover:bg-zinc-700 text-zinc-300'
                                 : 'bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-200'
                           }`}
                         >
@@ -2573,19 +2573,19 @@ XAI_API_KEY=`;
       </div>
 
       {/* Part 2: Structured Server Log Explorer */}
-      <div className="rounded-xl border border-slate-800/90 border-l-4 border-l-emerald-500 bg-[#0B111E] p-5 space-y-4 shadow-xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 pb-3.5">
+      <div className="rounded-xl border border-zinc-800/90 border-l-4 border-l-emerald-500 bg-[#111113] p-5 space-y-4 shadow-xl">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3.5">
           <div>
             <h3 className="text-base font-bold text-white flex items-center gap-2">
               <Terminal className="w-5 h-5 text-emerald-400" />
               <span>Structured JSONL Runtime Log Explorer</span>
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300">
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-zinc-800 text-zinc-300">
                 {logFilePath}
               </span>
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Streams tenant-isolated server telemetry, AI provider probes, secret-redaction checks, and RBAC security denials written to{' '}
-              <code className="text-slate-300">{logFilePath}</code>.
+              <code className="text-zinc-300">{logFilePath}</code>.
             </p>
           </div>
 
@@ -2611,7 +2611,7 @@ XAI_API_KEY=`;
             <button
               type="button"
               onClick={() => setExpandAllLogs((prev) => !prev)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono"
             >
               <span>
                 {expandAllLogs ? 'Collapse Payloads' : 'Expand All Payloads'}
@@ -2621,16 +2621,16 @@ XAI_API_KEY=`;
               type="button"
               onClick={handleExportLogsJsonl}
               disabled={filteredLogs.length === 0}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono disabled:opacity-40"
             >
-              <Download className="w-3.5 h-3.5 text-indigo-400" />
+              <Download className="w-3.5 h-3.5 text-zinc-300" />
               <span>Export JSONL</span>
             </button>
             <button
               type="button"
               onClick={() => void fetchServerLogs(true)}
               disabled={loadingLogs}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 border border-slate-700 text-slate-200 text-xs font-mono"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono"
             >
               {loadingLogs ? (
                 <span
@@ -2668,7 +2668,7 @@ XAI_API_KEY=`;
                   Zero-Trust RBAC `audit.view` Guard Enforced for Role `{activeActorRole.toUpperCase()}`
                 </span>
               </div>
-              <p className="text-slate-300">
+              <p className="text-zinc-300">
                 {logsForbiddenReason} Switch the top-right persona selector to{' '}
                 <strong className="text-white">Owner</strong> or{' '}
                 <strong className="text-white">Admin</strong> to inspect live server logs, or click the button to record a live HTTP 403 denial in the Security Audit Ledger.
@@ -2686,7 +2686,7 @@ XAI_API_KEY=`;
 
         {/* Log Filter Controls */}
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800 text-xs font-mono">
+          <div className="inline-flex rounded-lg bg-zinc-950 p-1 border border-zinc-800 text-xs font-mono">
             {(['all', 'info', 'warn', 'error'] as const).map((lvl) => (
               <button
                 key={lvl}
@@ -2694,8 +2694,8 @@ XAI_API_KEY=`;
                 onClick={() => setLogLevelFilter(lvl)}
                 className={`px-3 py-1 rounded-md uppercase transition-all ${
                   logLevelFilter === lvl
-                    ? 'bg-indigo-600 text-white font-bold'
-                    : 'text-slate-400 hover:text-slate-200'
+                    ? 'bg-white text-zinc-950 font-bold'
+                    : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 {lvl} ({levelCounts[lvl]})
@@ -2704,20 +2704,20 @@ XAI_API_KEY=`;
           </div>
 
           <div className="relative flex-1 max-w-xs">
-            <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-2.5" />
+            <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
             <input
               type="text"
               value={logSearch}
               onChange={(e) => setLogSearch(e.target.value)}
               placeholder="Search component, event, or payload..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 font-mono"
+              className="w-full bg-zinc-950 border border-zinc-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-zinc-200 font-mono"
             />
           </div>
         </div>
 
-        <div className="rounded-xl bg-[#070B14] border border-slate-800 p-3 max-h-96 overflow-y-auto space-y-2.5 font-mono text-xs">
+        <div className="rounded-xl bg-[#09090B] border border-zinc-800 p-3 max-h-96 overflow-y-auto space-y-2.5 font-mono text-xs">
           {filteredLogs.length === 0 ? (
-            <div className="py-6 text-center text-slate-500">
+            <div className="py-6 text-center text-zinc-500">
               {logsForbiddenReason
                 ? `Runtime logs hidden for role "${activeActorRole.toUpperCase()}" (requires audit.view permission).`
                 : 'No structured runtime log entries match the active filter.'}
@@ -2739,7 +2739,7 @@ XAI_API_KEY=`;
               return (
                 <div
                   key={rowKey}
-                  className={`p-3 rounded-xl bg-[#0B111E] border border-slate-800/80 border-l-4 ${levelBorder} space-y-2`}
+                  className={`p-3 rounded-xl bg-[#111113] border border-zinc-800/80 border-l-4 ${levelBorder} space-y-2`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -2755,11 +2755,11 @@ XAI_API_KEY=`;
                         {entry.level}
                       </span>
                       {entry.component && (
-                        <span className="px-1.5 py-0.5 rounded bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-[10px]">
+                        <span className="px-1.5 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-200 text-[10px]">
                           [{entry.component}]
                         </span>
                       )}
-                      <span className="text-[10px] text-slate-500">
+                      <span className="text-[10px] text-zinc-500">
                         {new Date(entry.timestamp).toLocaleTimeString()}
                       </span>
                       <span className="font-bold text-white">
@@ -2776,7 +2776,7 @@ XAI_API_KEY=`;
                             [rowKey]: !prev[rowKey],
                           }))
                         }
-                        className="px-2 py-0.5 rounded bg-slate-950 hover:bg-slate-800 border border-slate-700 text-[10px] text-slate-300"
+                        className="px-2 py-0.5 rounded bg-zinc-950 hover:bg-zinc-800 border border-zinc-700 text-[10px] text-zinc-300"
                       >
                         {isExpanded ? 'Hide Context ▴' : 'Context JSON ▾'}
                       </button>
@@ -2784,7 +2784,7 @@ XAI_API_KEY=`;
                   </div>
 
                   {hasContext && isExpanded && (
-                    <pre className="p-2.5 rounded bg-slate-950 border border-slate-800 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap">
+                    <pre className="p-2.5 rounded bg-zinc-950 border border-zinc-800 text-[11px] text-emerald-300 overflow-x-auto whitespace-pre-wrap">
                       {JSON.stringify(entry.context, null, 2)}
                     </pre>
                   )}
@@ -2797,28 +2797,28 @@ XAI_API_KEY=`;
 
       {/* Collapsible Local .env & pnpm Quickstart Modal */}
       {showEnvModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-xl w-full p-5 space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="fixed inset-0 z-50 bg-zinc-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl max-w-xl w-full p-5 space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
               <div>
                 <h3 className="text-sm font-bold text-white">
                   Local `.env` Template &amp; `pnpm` CLI Quickstart
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   Zero cloud keys required to boot — PGlite and `gemini-free` work out-of-the-box.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => setShowEnvModal(false)}
-                className="p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white"
+                className="p-1.5 rounded-lg bg-zinc-800 text-zinc-300 hover:text-white"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="relative">
-              <pre className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-emerald-300 overflow-x-auto">
+              <pre className="p-3.5 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-mono text-emerald-300 overflow-x-auto">
                 {envTemplateText}
               </pre>
               <button
@@ -2828,15 +2828,15 @@ XAI_API_KEY=`;
                   setCopiedEnv(true);
                   setTimeout(() => setCopiedEnv(false), 2000);
                 }}
-                className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-mono flex items-center gap-1"
+                className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[11px] font-mono flex items-center gap-1"
               >
                 {copiedEnv ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                 <span>{copiedEnv ? 'Copied' : 'Copy .env'}</span>
               </button>
             </div>
 
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 space-y-1">
-              <div className="text-slate-400"># Run locally with pnpm:</div>
+            <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-mono text-zinc-300 space-y-1">
+              <div className="text-zinc-400"># Run locally with pnpm:</div>
               <div>pnpm install</div>
               <div>pnpm seed</div>
               <div>pnpm dev</div>
