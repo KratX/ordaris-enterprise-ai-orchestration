@@ -290,7 +290,7 @@ export function App() {
   >(null);
   const [resetMenuOpen, setResetMenuOpen] = useState<boolean>(false);
   const [resettingMode, setResettingMode] = useState<string | null>(null);
-  const [showGuidedTour, setShowGuidedTour] = useState<boolean>(true);
+  const [showGuidedTour, setShowGuidedTour] = useState<boolean>(false);
   const [showDbDiagnosticsModal, setShowDbDiagnosticsModal] = useState<boolean>(false);
   const [diagnosticsData, setDiagnosticsData] = useState<SystemDiagnosticsData | null>(null);
   const [loadingDiagnostics, setLoadingDiagnostics] = useState<boolean>(false);
@@ -308,6 +308,9 @@ export function App() {
   const [creatingAgent, setCreatingAgent] = useState<boolean>(false);
   const [publishingAgent, setPublishingAgent] = useState<boolean>(false);
   const [updatingAllowlist, setUpdatingAllowlist] = useState<boolean>(false);
+  const [showDraftEditor, setShowDraftEditor] = useState<boolean>(false);
+  const [draftPromptInput, setDraftPromptInput] = useState<string>('');
+  const [savingDraft, setSavingDraft] = useState<boolean>(false);
 
   // Top Floating Popup Notification & History State
   const [toast, setToast] = useState<{
@@ -491,7 +494,16 @@ export function App() {
     events: RunDetailEvent[];
   } | null>(null);
 
+  const clearInspectedRun = useCallback(() => {
+    setInspectedRunId(null);
+    setInspectedRunDetail(null);
+    setCursorResumeResult(null);
+    setExpandedStepPayloads({});
+    setShowAllStepJson(false);
+  }, []);
+
   const tokenCacheRef = useRef<Record<string, string>>({});
+  const hasInitialRunSelectionRef = useRef<boolean>(false);
 
   // Unified API Fetch helper that exchanges persona for an AUTH_SECRET-signed HS256 JWT (`Authorization: Bearer <token>`)
   const apiFetch = useCallback(
@@ -627,8 +639,11 @@ export function App() {
 
       const loadedRuns: RunRecord[] = Array.isArray(d.runs) ? d.runs : [];
       setRuns(loadedRuns);
-      if (loadedRuns.length > 0 && !inspectedRunId) {
-        setInspectedRunId(loadedRuns[0]!.id);
+      if (!hasInitialRunSelectionRef.current) {
+        hasInitialRunSelectionRef.current = true;
+        if (loadedRuns.length > 0) {
+          setInspectedRunId(loadedRuns[0]!.id);
+        }
       }
 
       setDocuments(Array.isArray(d.documents) ? d.documents : []);
@@ -1139,6 +1154,7 @@ export function App() {
     }
     setRunningStudio(true);
     setArenaComparisonResult(null);
+    clearInspectedRun();
 
     try {
       const activeAgent =
@@ -1391,6 +1407,7 @@ export function App() {
       setNewAgentTools(['calculator', 'knowledge_search']);
       await fetchWorkspace();
       if (createdId) {
+        clearInspectedRun();
         setSelectedAgentId(createdId);
       }
     } finally {
@@ -1448,6 +1465,7 @@ export function App() {
         'success',
         `${exists ? 'Disabled' : 'Enabled'} "${toolName}" on "${selectedAgent.name}". Server-side ToolGateway now enforces [${nextTools.length > 0 ? nextTools.join(', ') : 'none'}].`
       );
+      clearInspectedRun();
       await fetchWorkspace();
     } finally {
       setUpdatingAllowlist(false);
@@ -1480,6 +1498,7 @@ export function App() {
         'success',
         `SHA-256 Config Hash: ${snapHash}… • Pinned in agent_versions table.`
       );
+      clearInspectedRun();
       await fetchWorkspace();
     } finally {
       setPublishingAgent(false);
@@ -1609,6 +1628,56 @@ export function App() {
     [agentVersions, selectedAgent]
   );
 
+  const latestPublishedSnapshot = useMemo(
+    () =>
+      [...selectedAgentVersions].sort(
+        (a, b) => b.versionNumber - a.versionNumber
+      )[0] ?? null,
+    [selectedAgentVersions]
+  );
+
+  const draftPromptChanged = Boolean(
+    selectedAgent &&
+      latestPublishedSnapshot &&
+      selectedAgent.draftSystemPrompt !== latestPublishedSnapshot.systemPrompt
+  );
+
+  useEffect(() => {
+    setDraftPromptInput(selectedAgent?.draftSystemPrompt ?? '');
+    setShowDraftEditor(false);
+  }, [selectedAgent?.id, selectedAgent?.draftSystemPrompt]);
+
+  const handleSaveDraftPrompt = async () => {
+    if (!selectedAgent || !draftPromptInput.trim() || savingDraft) return;
+    setSavingDraft(true);
+    try {
+      const response = await apiFetch(`/api/v1/agents/${selectedAgent.id}`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ draftSystemPrompt: draftPromptInput.trim() }),
+      });
+      const body = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        notify(
+          `Draft Update Blocked (HTTP ${response.status})`,
+          'error',
+          body?.detail || 'The agent draft could not be saved.'
+        );
+        return;
+      }
+      clearInspectedRun();
+      await fetchWorkspace();
+      setShowDraftEditor(false);
+      notify(
+        'Draft Instructions Saved',
+        'success',
+        'The published snapshot is unchanged. Publish a new snapshot before a run can use these instructions.'
+      );
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
   // Pre-Flight Token & Cost Estimator
   const estimatedPromptTokens = Math.max(
     12,
@@ -1618,6 +1687,16 @@ export function App() {
     selectedEngine === 'mock'
       ? '0.000000'
       : ((estimatedPromptTokens * 2.2 * 0.45) / 1_000_000).toFixed(6);
+  const providerResolutionLabel =
+    selectedEngine === 'mock'
+      ? 'Mock provider'
+      : selectedEngine === 'auto'
+        ? 'Automatic resolution'
+        : selectedEngine === 'gemini-free' || selectedEngine === 'openrouter-free'
+          ? 'Free provider ready'
+          : isEngineKeyConfigured(selectedEngine, byokProviders)
+            ? 'BYOK key ready'
+            : 'Key required';
 
   const pendingApprovalsCount = approvals.filter(
     (a) => a.status === 'pending'
@@ -1773,6 +1852,7 @@ export function App() {
           runningStudio ||
           publishingAgent ||
           updatingAllowlist ||
+          savingDraft ||
           Boolean(resettingMode)) && (
           <div
             className="absolute inset-x-0 bottom-0 h-0.5 bg-zinc-700/40 ordaris-loading-shimmer"
@@ -1814,6 +1894,7 @@ export function App() {
                 value={activeActorId}
                 onChange={(e) => {
                   const nextId = e.target.value as DemoPersonaId;
+                  clearInspectedRun();
                   setActiveActorId(nextId);
                   const nextP =
                     PERSONA_OPTIONS.find((p) => p.id === nextId) ??
@@ -2169,102 +2250,107 @@ export function App() {
         )}
       </div>
 
+      <div className="flex-1 w-full max-w-[1800px] mx-auto flex flex-col lg:flex-row items-stretch">
       {/* 5-PILLAR NAVIGATION BAR (HIGHLIGHTED MONOCHROME BOX TABS) */}
-      <div className="max-w-[1600px] w-full mx-auto px-5 lg:px-8 pt-4">
-        <div className="flex flex-wrap xl:flex-nowrap items-center justify-between gap-2 border-b border-zinc-800 pb-3.5">
+      <aside className="relative w-full lg:w-[220px] xl:w-[236px] lg:shrink-0 lg:sticky lg:top-[72px] lg:self-start lg:h-[calc(100vh-72px)] border-b lg:border-b-0 lg:border-r border-zinc-800 bg-[#0c0c0e] lg:overflow-y-auto">
+        <div className="px-3 py-2.5 lg:py-4 space-y-2 lg:space-y-3">
           <nav
-            className="flex flex-wrap xl:flex-nowrap items-center gap-1.5"
-            aria-label="Main Control Plane Navigation"
+            className="ordaris-mobile-nav flex flex-row lg:flex-col items-stretch gap-1 overflow-x-auto lg:overflow-visible"
+            aria-label="Main navigation"
           >
+            <div className="hidden lg:block px-2 pt-1 pb-1 text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500">Build</div>
             <button
               type="button"
               onClick={() => setActiveTab('studio')}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition ${
                 activeTab === 'studio'
-                  ? 'bg-white text-zinc-950 shadow-md shadow-white/10 border border-white'
-                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+                  ? 'bg-white text-zinc-950 border border-white'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900 border border-transparent'
               }`}
+              aria-current={activeTab === 'studio' ? 'page' : undefined}
             >
               <Sparkles className="w-3.5 h-3.5 shrink-0" />
-              <span>1. Agent Studio &amp; 2-Engine Arena</span>
+              <span>Agent Studio</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('rag')}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition ${
                 activeTab === 'rag'
-                  ? 'bg-white text-zinc-950 shadow-md shadow-white/10 border border-white'
-                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+                  ? 'bg-white text-zinc-950 border border-white'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900 border border-transparent'
               }`}
+              aria-current={activeTab === 'rag' ? 'page' : undefined}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
-              <span>2. Hybrid RAG &amp; Citations ({documents.length})</span>
+              <span>Knowledge</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab('workflow')}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition ${
                 activeTab === 'workflow'
-                  ? 'bg-white text-zinc-950 shadow-md shadow-white/10 border border-white'
-                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+                  ? 'bg-white text-zinc-950 border border-white'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900 border border-transparent'
               }`}
+              aria-current={activeTab === 'workflow' ? 'page' : undefined}
             >
               <GitBranch className="w-3.5 h-3.5 shrink-0" />
-              <span>3. 6-Node DAG &amp; HITL Queue</span>
+              <span>Workflows &amp; HITL</span>
               {pendingApprovalsCount > 0 && (
                 <span
-                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono tabular-nums ${
-                    activeTab === 'workflow'
-                      ? 'bg-amber-500 text-zinc-950 font-bold'
-                      : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                  }`}
+                  className="ml-auto px-1.5 py-0.5 rounded text-[10px] font-mono tabular-nums bg-amber-500/15 text-amber-300 border border-amber-500/30"
+                  aria-label={`${pendingApprovalsCount} pending approvals`}
                 >
-                  {pendingApprovalsCount} pending
+                  {pendingApprovalsCount}
                 </span>
               )}
             </button>
 
+            <div className="hidden lg:block px-2 pt-3 pb-1 text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500">Operate</div>
             <button
               type="button"
               onClick={() => setActiveTab('governance')}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition ${
                 activeTab === 'governance'
-                  ? 'bg-white text-zinc-950 shadow-md shadow-white/10 border border-white'
-                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+                  ? 'bg-white text-zinc-950 border border-white'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900 border border-transparent'
               }`}
+              aria-current={activeTab === 'governance' ? 'page' : undefined}
             >
               <Award className="w-3.5 h-3.5 shrink-0" />
-              <span>4. Governance, FinOps &amp; RBAC</span>
+              <span>Governance, FinOps &amp; Audit</span>
             </button>
 
+            <div className="hidden lg:block px-2 pt-3 pb-1 text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500">System</div>
             <button
               type="button"
               onClick={() => setActiveTab('engines')}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 whitespace-nowrap shrink-0 transition ${
+              className={`px-2.5 py-2 rounded-lg text-xs font-semibold flex items-center gap-2 whitespace-nowrap shrink-0 transition ${
                 activeTab === 'engines'
-                  ? 'bg-white text-zinc-950 shadow-md shadow-white/10 border border-white'
-                  : 'bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800'
+                  ? 'bg-white text-zinc-950 border border-white'
+                  : 'text-zinc-300 hover:text-white hover:bg-zinc-900 border border-transparent'
               }`}
+              aria-current={activeTab === 'engines' ? 'page' : undefined}
             >
               <Cpu className="w-3.5 h-3.5 shrink-0" />
-              <span>5. 3-Tier Engine Matrix &amp; Logs</span>
+              <span>Engine Matrix &amp; Logs</span>
             </button>
           </nav>
 
           {/* Active AI Engine Selector — Contained Within Viewport */}
-          <div className="flex items-center gap-1.5 shrink-0">
-            <span className="text-[11px] font-mono text-zinc-400 whitespace-nowrap hidden 2xl:inline">
-              Active Engine:
-            </span>
+          <div className="mt-2 lg:mt-4 pt-2 lg:pt-3 border-t border-zinc-800 space-y-2">
+            <label htmlFor="global-engine-selector" className="block px-2 text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500">Active engine</label>
             <select
+              id="global-engine-selector"
               aria-label="Global AI Engine Selector"
               value={selectedEngine}
               onChange={(e) => {
                 handleSelectEngineWithByokGate(e.target.value, 'global');
               }}
-              className="bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-xl px-2.5 py-1.5 text-xs font-mono text-zinc-100 w-[185px] xl:w-[205px] truncate transition-colors"
+              className="bg-zinc-900 border border-zinc-700 hover:border-zinc-500 rounded-lg px-2.5 py-2 text-xs font-mono text-zinc-100 w-full truncate transition-colors"
             >
               <option value="gemini-free">
                 gemini-free (Gemini 3 Flash — Free &amp; Always Available, Default)
@@ -2298,22 +2384,26 @@ export function App() {
               </option>
             </select>
           </div>
+          <button type="button" onClick={handleOpenDiagnostics} className="hidden lg:flex mt-2 w-full px-2.5 py-2 rounded-lg text-xs text-zinc-300 hover:text-white hover:bg-zinc-900 border border-zinc-800 items-center gap-2">
+            <Database className="w-3.5 h-3.5" /><span>Database diagnostics</span>
+          </button>
         </div>
-      </div>
+      </aside>
 
       {/* MAIN TAB WORKSPACE */}
-      <main className="flex-1 max-w-[1600px] w-full mx-auto px-5 lg:px-8 py-6">
+      <main className="flex-1 min-w-0 w-full max-w-[1564px] px-4 sm:px-5 xl:px-7 py-5 lg:py-7">
         {activeTab === 'studio' && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            {/* LEFT 5 COLS: AGENT REGISTRY, SNAPSHOT VERSIONING & COMPOSER */}
-            <div className="lg:col-span-5 space-y-5">
+          <div className="max-w-[1480px] mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7 items-start">
+            {/* PRIMARY WORK AREA: AGENT, PROMPT, GOVERNED RUN */}
+            <div className="lg:col-span-7 space-y-4">
               {/* Agent Selector & Snapshot Panel — Structured Card with Alabaster White Left Accent */}
               <div className="bg-[#111113] border border-zinc-800 border-l-4 border-l-zinc-100 rounded-xl divide-y divide-zinc-800 overflow-hidden shadow-sm">
                 <div className="p-4 sm:p-5 space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-950 border border-white text-[11px] font-mono font-bold uppercase">
-                        Agent Registry
+                        Agent
                       </span>
                       <span className="px-2 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300">
                         {activePersona.orgName}
@@ -2355,15 +2445,45 @@ export function App() {
                   </div>
 
                   <div>
-                    <h2 className="text-sm sm:text-base font-bold text-white mb-2.5">
-                      Governed Agent Registry &amp; Immutable Snapshots
-                    </h2>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500 mb-1">Agent Studio</div>
+                        <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white mb-2.5">
+                          {selectedAgent?.name ?? 'Choose an agent'}
+                        </h1>
+                        {selectedAgent && (
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-zinc-400">
+                            <span className="text-zinc-200">{latestPublishedSnapshot ? `Published snapshot v${latestPublishedSnapshot.versionNumber}` : 'No published snapshot'}</span>
+                            <span className={draftPromptChanged ? 'text-amber-300' : 'text-emerald-300'}>
+                              {latestPublishedSnapshot
+                                ? draftPromptChanged ? 'Draft instructions differ' : 'Draft matches published prompt'
+                                : 'Draft not yet published'}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      {selectedAgent && activePersona.role !== 'viewer' && (
+                        <button
+                          type="button"
+                          onClick={() => setShowDraftEditor((open) => !open)}
+                          className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-medium text-zinc-200"
+                          aria-expanded={showDraftEditor}
+                        >
+                          {showDraftEditor ? 'Close draft editor' : 'Edit draft instructions'}
+                        </button>
+                      )}
+                    </div>
                     <select
                       aria-label="Select Active Agent"
+                      disabled={agents.length === 0}
                       value={selectedAgentId}
-                      onChange={(e) => setSelectedAgentId(e.target.value)}
+                      onChange={(e) => {
+                        clearInspectedRun();
+                        setSelectedAgentId(e.target.value);
+                      }}
                       className="w-full h-10 bg-[#09090B] border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 text-xs sm:text-sm font-semibold text-white cursor-pointer transition-colors"
                     >
+                      {agents.length === 0 && <option value="">No agents available</option>}
                       {agents.map((ag) => (
                         <option key={ag.id} value={ag.id}>
                           {ag.name} ({ag.slug}) —{' '}
@@ -2401,7 +2521,9 @@ export function App() {
                       <span className="text-[11px] font-mono text-zinc-400">
                         {updatingAllowlist
                           ? 'Saving & pinning vN+1...'
-                          : 'Auto-pins Snapshot vN+1'}
+                          : draftPromptChanged
+                            ? 'Run uses published prompt until next publish'
+                            : 'Draft is aligned with published prompt'}
                       </span>
                     </div>
 
@@ -2456,18 +2578,47 @@ export function App() {
 
                     <div className="p-3 rounded-lg bg-[#09090B] border border-zinc-800 space-y-1">
                       <div className="text-[10px] font-mono uppercase tracking-wider text-zinc-400">
-                        Pinned System Prompt Instructions
+                        Draft System Instructions
                       </div>
                       <p className="text-xs text-zinc-200 font-mono leading-relaxed">
                         {selectedAgent.draftSystemPrompt}
                       </p>
                     </div>
+                    {showDraftEditor && (
+                      <div className="p-3 rounded-lg bg-[#111113] border border-zinc-700 space-y-3">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <label htmlFor="draft-system-prompt" className="text-xs font-semibold text-white">Draft system instructions</label>
+                            <p className="text-[11px] text-zinc-400 mt-1">Saving changes the draft. Publish a new snapshot before a run uses it.</p>
+                          </div>
+                          <span className="shrink-0 text-[10px] font-mono uppercase tracking-wider text-amber-300">Draft</span>
+                        </div>
+                        <textarea
+                          id="draft-system-prompt"
+                          rows={5}
+                          value={draftPromptInput}
+                          onChange={(event) => setDraftPromptInput(event.target.value)}
+                          className="w-full resize-y bg-[#09090B] border border-zinc-700 rounded-lg p-3 text-xs text-zinc-100 font-mono leading-relaxed focus:border-zinc-400"
+                        />
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-[11px] text-zinc-500">Published runs remain pinned to their immutable snapshot.</span>
+                          <button
+                            type="button"
+                            disabled={savingDraft || activePersona.role === 'viewer' || !draftPromptInput.trim() || draftPromptInput === selectedAgent.draftSystemPrompt}
+                            onClick={() => void handleSaveDraftPrompt()}
+                            className="h-8 px-3 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-40 text-xs font-semibold text-zinc-950"
+                          >
+                            {savingDraft ? 'Saving…' : 'Save draft'}
+                          </button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
               {/* Execution Composer + 2-Engine Arena Toggle + Pre-Flight Estimator */}
-              <div className="bg-[#111113] border border-zinc-800 border-l-4 border-l-emerald-500 rounded-xl p-4 sm:p-5 space-y-4 shadow-sm">
+              <div className="bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-4 shadow-sm">
                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
                   <div className="flex items-center gap-2">
                     <span className="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold uppercase">
@@ -2492,8 +2643,9 @@ export function App() {
                 </div>
 
                 <h3 className="text-sm sm:text-base font-bold text-white">
-                  Execution Prompt &amp; Guardrail Boundary
+                  Test this agent
                 </h3>
+                <p className="-mt-2 text-xs text-zinc-400">Runs use the selected immutable snapshot and the current tenant permissions.</p>
 
                 {arenaMode && (
                   <div className="grid grid-cols-2 gap-3 p-3.5 rounded-lg bg-[#16161A] border border-zinc-700">
@@ -2636,13 +2788,20 @@ export function App() {
                   </button>
                 </div>
 
+                <label htmlFor="studio-run-prompt" className="sr-only">Prompt to run</label>
                 <textarea
+                  id="studio-run-prompt"
                   rows={3}
                   value={promptInput}
                   onChange={(e) => setPromptInput(e.target.value)}
-                  placeholder="Enter a prompt to execute tool calls and grounded hybrid RAG synthesis..."
+                  placeholder="Write a prompt for this agent..."
                   className="w-full bg-[#09090B] border border-zinc-800 rounded-lg p-3.5 text-sm text-zinc-100 leading-relaxed focus:border-zinc-400 focus:outline-none"
                 />
+                {(!selectedAgentId || !promptInput.trim()) && (
+                  <p className="-mt-2 text-xs text-amber-300" role="status">
+                    {!selectedAgentId ? 'Choose or create an agent before running.' : 'Enter a prompt to enable Run agent.'}
+                  </p>
+                )}
 
                 {/* Idempotency Key Input */}
                 <div className="flex items-center gap-2">
@@ -2670,23 +2829,18 @@ export function App() {
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-mono text-zinc-300 tabular-nums">
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                      Est. Tokens: <strong className="text-white">~{estimatedPromptTokens} tok</strong>
+                      Prompt estimate: <strong className="text-white">~{estimatedPromptTokens} tokens</strong>
                     </span>
                     <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                      Est. Cost: <strong className="text-emerald-300">${estimatedCostUsd}</strong>
+                      Cost estimate: <strong className="text-blue-300">${estimatedCostUsd}</strong>
                     </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                    Role:{' '}
-                    <strong className="text-white">
-                      {activePersona.role.toUpperCase()}
-                    </strong>
-                  </span>
+                  <span className="text-[10px] text-zinc-500">Prompt-length heuristic · provider usage is recorded after the run</span>
                 </div>
 
                 <button
                   type="button"
-                  disabled={runningStudio || !selectedAgentId}
+                  disabled={runningStudio || !selectedAgentId || !promptInput.trim()}
                   onClick={handleExecuteStudioRun}
                   className="w-full h-10 px-4 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-60 text-zinc-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition shadow-md shadow-white/5"
                 >
@@ -2700,17 +2854,31 @@ export function App() {
                   )}
                   <span>
                     {runningStudio
-                      ? `Executing Governed Run on ${selectedEngine}...`
+                      ? `Running on ${selectedEngine}...`
                       : arenaMode
-                        ? `Run 2-Engine Arena (${selectedEngine} vs ${arenaRightEngine})`
-                        : `Execute Governed Agent Run (${selectedEngine})`}
+                        ? `Run both engines (${selectedEngine} · ${arenaRightEngine})`
+                        : 'Run agent'}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* RIGHT 7 COLS: ARENA DIFF OR DEEP RUN STEP INSPECTOR & SSE REPLAY */}
-            <div className="lg:col-span-7 space-y-5">
+            {/* RUN RESULT AND CONTEXT */}
+            <div className="lg:col-span-5 space-y-4">
+              <aside className="bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-3" aria-label="Current run context">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-xs font-semibold text-white">Run context</h2>
+                  <span className="text-[10px] font-mono text-blue-300">{selectedEngine}</span>
+                </div>
+                <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-xs">
+                  <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Workspace</dt><dd className="mt-0.5 text-zinc-200 truncate">{activePersona.orgName}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Persona</dt><dd className="mt-0.5 text-zinc-200">{activePersona.role}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Snapshot</dt><dd className="mt-0.5 text-zinc-200">{latestPublishedSnapshot ? `v${latestPublishedSnapshot.versionNumber}` : 'Will pin v1 on run'}</dd></div>
+                  <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Provider</dt><dd className="mt-0.5 text-blue-300">{providerResolutionLabel}</dd></div>
+                  <div className="col-span-2"><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Tool allowlist</dt><dd className="mt-1 flex flex-wrap gap-1.5">{(selectedAgent?.draftToolAllowlist ?? []).length ? selectedAgent!.draftToolAllowlist.map((tool) => <code key={tool} className="rounded bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-200">{tool}</code>) : <span className="text-zinc-400">No tools enabled</span>}</dd></div>
+                </dl>
+                {draftPromptChanged && <p className="border-t border-zinc-800 pt-2 text-[11px] text-amber-300">Draft differs from the published snapshot. Publish to include those instructions in the next run.</p>}
+              </aside>
               {/* Side-by-Side 2-Engine Arena Results (When Active) */}
               {arenaComparisonResult && (
                 <div className="bg-[#111113] border border-zinc-700 rounded-xl p-5 space-y-4">
@@ -2771,10 +2939,10 @@ export function App() {
                 <div className="p-4 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-[11px] font-mono text-zinc-400">
-                      Run Telemetry &amp; Deterministic Audit Trail
+                      Selected run
                     </div>
                     <h3 className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5">
-                      Execution Trace, Tool Steps &amp; SSE `Last-Event-ID` Cursor Replay
+                      Result and execution trace
                     </h3>
                   </div>
 
@@ -3617,13 +3785,14 @@ export function App() {
                       </>
                     ) : (
                       <div className="text-xs text-zinc-400">
-                        Select or execute a run to inspect steps and SSE events.
+                        Run this agent to see its answer and runtime events here.
                       </div>
                     )}
                   </div>
                 )}
               </div>
             </div>
+          </div>
           </div>
         )}
 
@@ -3722,6 +3891,7 @@ export function App() {
           />
         )}
       </main>
+      </div>
 
       {/* FOOTER DATABASE & SESSION DIAGNOSTICS BAR */}
       <footer className="border-t border-zinc-800 bg-[#09090B] px-5 lg:px-8 py-4 mt-auto">

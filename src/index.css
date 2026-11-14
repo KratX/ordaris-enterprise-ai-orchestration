@@ -192,6 +192,27 @@
   animation: ordarisShimmerBar 1.25s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ordaris-mobile-nav {
+    scrollbar-width: none;
+  }
+
+  .ordaris-mobile-nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 /* Comfortable Mode Global Readability & Spacing Enhancements */
 .ordaris-comfortable p {
   line-height: 1.65;
