@@ -3374,7 +3374,7 @@ export function App() {
                       <div className={`text-[10px] font-mono uppercase tracking-wider ${arenaComparisonResult.leftRun ? getRunStatusTextTone(arenaComparisonResult.leftRun.status) : 'text-amber-300'}`}>
                         {arenaComparisonResult.leftRun?.status ?? 'No run returned'}
                       </div>
-                      <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+                      <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed min-h-64 max-h-[60vh] overflow-y-auto">
                         {arenaComparisonResult.leftRun?.finalOutput ||
                           arenaComparisonResult.leftRun?.errorMessage ||
                           'No output returned'}
@@ -3393,7 +3393,7 @@ export function App() {
                       <div className={`text-[10px] font-mono uppercase tracking-wider ${arenaComparisonResult.rightRun ? getRunStatusTextTone(arenaComparisonResult.rightRun.status) : 'text-amber-300'}`}>
                         {arenaComparisonResult.rightRun?.status ?? 'No run returned'}
                       </div>
-                      <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
+                      <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed min-h-64 max-h-[60vh] overflow-y-auto">
                         {arenaComparisonResult.rightRun?.finalOutput ||
                           arenaComparisonResult.rightRun?.errorMessage ||
                           'No output returned'}

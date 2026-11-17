@@ -561,9 +561,12 @@
     grid-row: 1;
   }
 
-  .ordaris-run-context-card,
-  .ordaris-arena-result {
+  .ordaris-run-context-card {
     grid-column: 2;
+  }
+
+  .ordaris-arena-result {
+    grid-column: 1 / -1;
   }
 
   .ordaris-run-result-card {
