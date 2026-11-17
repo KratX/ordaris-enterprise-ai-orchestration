@@ -97,6 +97,24 @@
   border-color: var(--ordaris-line) !important;
 }
 
+.ordaris-run-result-card,
+.ordaris-arena-result {
+  scroll-margin-block-start: 6rem;
+}
+
+.ordaris-run-result-card [data-result-heading]:focus,
+.ordaris-arena-result [data-result-heading]:focus {
+  outline: 2px solid rgba(250, 250, 250, 0.75);
+  outline-offset: 4px;
+}
+
+@media (max-width: 767px) {
+  .ordaris-run-result-card,
+  .ordaris-arena-result {
+    scroll-margin-block-start: 2rem;
+  }
+}
+
 .ordaris-app-frame {
   max-width: 1880px;
 }

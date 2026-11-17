@@ -196,6 +196,89 @@ interface RunDetailEvent {
   createdAt: string;
 }
 
+interface RunInspection {
+  run: RunRecord;
+  steps: RunDetailStep[];
+  events: RunDetailEvent[];
+}
+
+interface StudioProgressRun {
+  id: string;
+  engine: string;
+  status: string;
+  phase: string;
+  stepCount: number;
+  toolCount: number;
+}
+
+function isTerminalRunStatus(status: string): boolean {
+  return ['succeeded', 'failed', 'cancelled', 'timed_out'].includes(status);
+}
+
+function getRunStatusTextTone(status: string): string {
+  if (status === 'succeeded') return 'text-emerald-400';
+  if (['queued', 'running', 'waiting_approval'].includes(status)) return 'text-amber-300';
+  return 'text-rose-400';
+}
+
+function describeRunPhase(inspection: RunInspection): string {
+  const { run, steps, events } = inspection;
+  if (run.status === 'queued') return 'Queued for a worker';
+  if (run.status === 'waiting_approval') return 'Waiting for approval';
+  if (run.status === 'succeeded') return 'Run complete';
+  if (run.status === 'failed') return 'Run failed';
+  if (run.status === 'cancelled') return 'Run cancelled';
+  if (run.status === 'timed_out') return 'Run timed out';
+
+  const latestEvent = events.length ? events[events.length - 1]?.eventType : undefined;
+  if (latestEvent === 'step.model_completed') return 'Model response received';
+  if (latestEvent === 'step.tool_failed') return 'Tool step failed';
+  if (latestEvent === 'step.tool_completed') {
+    const latestTool = [...steps].reverse().find((step) => step.stepType === 'tool_call');
+    return latestTool?.toolName ? `${latestTool.toolName} completed` : 'Tool step complete';
+  }
+  if (steps.some((step) => step.stepType === 'final_answer')) return 'Preparing final response';
+  if (steps.some((step) => step.stepType === 'tool_call')) return 'Using agent tools';
+  if (steps.some((step) => step.stepType === 'model_turn')) return 'Planning response';
+  return 'Starting run';
+}
+
+function getRunRecoveryAdvice(status: string, message: string): string {
+  const detail = message.toLowerCase();
+  if (status === 'cancelled') return 'Run it again when you are ready.';
+  if (status === 'timed_out' || detail.includes('timeout')) {
+    return 'Shorten the prompt or reduce the number of tool steps, then retry.';
+  }
+  if (/permission|policy|role|forbidden|denied/.test(detail)) {
+    return 'Check the active role and agent permissions before retrying.';
+  }
+  if (/api key|provider key|credential|byok|provider/.test(detail)) {
+    return 'Configure the provider key in BYOK Vault, then retry.';
+  }
+  if (/tool|allowlist/.test(detail)) {
+    return 'Review the published tool allowlist and retry with an enabled tool.';
+  }
+  return 'Review the run trace for the failing step, then retry.';
+}
+
+function getExecutionIssueKind(message: string): 'retry' | 'permissions' | 'provider' {
+  const detail = message.toLowerCase();
+  if (/api key|provider key|credential|byok|provider/.test(detail)) return 'provider';
+  if (/permission|policy|role|forbidden|denied|rbac/.test(detail)) return 'permissions';
+  return 'retry';
+}
+
+function getArenaLineDifferences(left: string, right: string): { leftOnly: string[]; rightOnly: string[] } {
+  const leftLines = left.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const rightLines = right.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+  const leftSet = new Set(leftLines);
+  const rightSet = new Set(rightLines);
+  return {
+    leftOnly: [...new Set(leftLines.filter((line) => !rightSet.has(line)))],
+    rightOnly: [...new Set(rightLines.filter((line) => !leftSet.has(line)))],
+  };
+}
+
 interface SystemDiagnosticsData {
   collectedAt: string;
   version: string;
@@ -471,12 +554,19 @@ export function App() {
   );
   const [idempotencyKeyInput, setIdempotencyKeyInput] = useState<string>('');
   const [runningStudio, setRunningStudio] = useState<boolean>(false);
-  const [inspectedRunId, setInspectedRunId] = useState<string | null>(null);
-  const [inspectedRunDetail, setInspectedRunDetail] = useState<{
-    run: RunRecord;
-    steps: RunDetailStep[];
-    events: RunDetailEvent[];
+  const [studioProgress, setStudioProgress] = useState<StudioProgressRun[]>([]);
+  const [cancelingRunIds, setCancelingRunIds] = useState<string[]>([]);
+  const [executionIssue, setExecutionIssue] = useState<{
+    message: string;
+    recovery: string;
+    kind: 'retry' | 'permissions' | 'provider';
   } | null>(null);
+  const [inspectedRunId, setInspectedRunId] = useState<string | null>(null);
+  const [inspectedRunDetail, setInspectedRunDetail] = useState<RunInspection | null>(null);
+  const [runStatusFilter, setRunStatusFilter] = useState<'all' | 'active' | 'succeeded' | 'failed'>('all');
+  const [runAgentFilter, setRunAgentFilter] = useState<string>('all');
+  const [runTimeFilter, setRunTimeFilter] = useState<'all' | 'day' | 'week' | 'month'>('all');
+  const [runSearch, setRunSearch] = useState<string>('');
   const [expandedStepPayloads, setExpandedStepPayloads] = useState<Record<string, boolean>>({});
   const [showAllStepJson, setShowAllStepJson] = useState<boolean>(false);
   const [traceViewFilter, setTraceViewFilter] = useState<'all' | 'answer' | 'steps' | 'sse'>('all');
@@ -494,6 +584,14 @@ export function App() {
     events: RunDetailEvent[];
   } | null>(null);
 
+  const runResultRef = useRef<HTMLDivElement>(null);
+  const arenaResultRef = useRef<HTMLDivElement>(null);
+  const pendingResultRevealRef = useRef<{
+    target: 'run' | 'arena';
+    focusAfter: boolean;
+    runIds?: string[];
+  } | null>(null);
+
   const clearInspectedRun = useCallback(() => {
     setInspectedRunId(null);
     setInspectedRunDetail(null);
@@ -504,6 +602,8 @@ export function App() {
 
   const tokenCacheRef = useRef<Record<string, string>>({});
   const hasInitialRunSelectionRef = useRef<boolean>(false);
+  const selectedRunIdRef = useRef<string | null>(inspectedRunId);
+  selectedRunIdRef.current = inspectedRunId;
 
   // Unified API Fetch helper that exchanges persona for an AUTH_SECRET-signed HS256 JWT (`Authorization: Bearer <token>`)
   const apiFetch = useCallback(
@@ -1071,8 +1171,7 @@ export function App() {
 
   // Inspect a specific run's steps & SSE events
   const inspectRunById = useCallback(
-    async (runId: string) => {
-      setInspectedRunId(runId);
+    async (runId: string): Promise<RunInspection | null> => {
       setCursorResumeResult(null);
       try {
         const res = await apiFetch(`/api/v1/runs/${runId}`);
@@ -1080,7 +1179,7 @@ export function App() {
         if (res.ok && body.data) {
           const rawSteps = Array.isArray(body.data.steps) ? body.data.steps : [];
           const rawEvents = Array.isArray(body.data.events) ? body.data.events : [];
-          setInspectedRunDetail({
+          const inspection: RunInspection = {
             run: body.data.run,
             steps: rawSteps.map((s: Record<string, unknown>) => {
               const rawName = (s.toolName ?? s.modelOrToolName ?? null) as string | null;
@@ -1126,24 +1225,140 @@ export function App() {
               payloadJson: (e.payloadJson ?? e.payload ?? {}) as Record<string, unknown>,
               createdAt: String(e.createdAt ?? ''),
             })),
-          });
+          };
+          if (selectedRunIdRef.current === runId) {
+            setInspectedRunDetail(inspection);
+          }
+          return inspection;
         }
       } catch {
         // Ignore transient fetch errors
       }
+      return null;
     },
     [apiFetch]
   );
 
   useEffect(() => {
     if (inspectedRunId) {
+      setInspectedRunDetail(null);
       void inspectRunById(inspectedRunId);
     }
   }, [inspectedRunId, inspectRunById]);
 
+  useEffect(() => {
+    const pendingReveal = pendingResultRevealRef.current;
+    if (
+      inspectedRunId &&
+      pendingReveal?.runIds?.length &&
+      !pendingReveal.runIds.includes(inspectedRunId)
+    ) {
+      pendingResultRevealRef.current = null;
+    }
+  }, [inspectedRunId]);
+
+  const pollRunUntilTerminal = useCallback(
+    async (runId: string, engine: string): Promise<RunInspection | null> => {
+      let latestInspection: RunInspection | null = null;
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < 5 * 60 * 1000) {
+        const inspection = await inspectRunById(runId);
+        if (inspection) {
+          latestInspection = inspection;
+          setStudioProgress((current) => {
+            const progressRun: StudioProgressRun = {
+              id: runId,
+              engine,
+              status: inspection.run.status,
+              phase: describeRunPhase(inspection),
+              stepCount: inspection.steps.length,
+              toolCount: inspection.steps.filter((step) => step.stepType === 'tool_call').length,
+            };
+            return current.some((item) => item.id === runId)
+              ? current.map((item) => (item.id === runId ? progressRun : item))
+              : [...current, progressRun];
+          });
+          if (isTerminalRunStatus(inspection.run.status)) return inspection;
+        }
+        await new Promise((resolve) => window.setTimeout(resolve, 800));
+      }
+      return latestInspection;
+    },
+    [inspectRunById]
+  );
+
+  const handleCancelRun = async (runId: string) => {
+    setCancelingRunIds((current) => [...new Set([...current, runId])]);
+    try {
+      const res = await apiFetch(`/api/v1/runs/${runId}/cancel`, { method: 'POST' });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        notify('Run could not be cancelled', 'error', body?.detail || 'The worker may have already completed this run.');
+        return;
+      }
+      notify('Run cancelled', 'info', `Run ${runId.slice(0, 8)} was stopped.`);
+      await inspectRunById(runId);
+      await fetchWorkspace();
+    } catch (err) {
+      notify(err instanceof Error ? err.message : 'Run cancellation failed', 'error');
+    } finally {
+      setCancelingRunIds((current) => current.filter((id) => id !== runId));
+    }
+  };
+
+  useEffect(() => {
+    const pendingReveal = pendingResultRevealRef.current;
+    if (!pendingReveal) return;
+    if (activeTab !== 'studio') {
+      pendingResultRevealRef.current = null;
+      return;
+    }
+
+    const resultReady =
+      pendingReveal.target === 'arena'
+        ? arenaComparisonResult !== null &&
+          (pendingReveal.runIds ?? []).every((runId) => {
+            const run = [arenaComparisonResult.leftRun, arenaComparisonResult.rightRun].find((item) => item?.id === runId);
+            return Boolean(run && isTerminalRunStatus(run.status));
+          }) &&
+          (arenaComparisonResult.leftRun === null || isTerminalRunStatus(arenaComparisonResult.leftRun.status)) &&
+          (arenaComparisonResult.rightRun === null || isTerminalRunStatus(arenaComparisonResult.rightRun.status))
+        : inspectedRunDetail !== null &&
+          (pendingReveal.runIds?.[0] === undefined || inspectedRunDetail.run.id === pendingReveal.runIds[0]) &&
+          isTerminalRunStatus(inspectedRunDetail.run.status);
+    if (!resultReady) return;
+
+    pendingResultRevealRef.current = null;
+    const resultElement =
+      pendingReveal.target === 'arena'
+        ? arenaResultRef.current
+        : runResultRef.current;
+    if (!resultElement) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)'
+    ).matches;
+    window.requestAnimationFrame(() => {
+      resultElement.scrollIntoView({
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+        block: 'start',
+      });
+      if (pendingReveal.focusAfter) {
+        resultElement.querySelector<HTMLElement>('[data-result-heading]')?.focus({
+          preventScroll: true,
+        });
+      }
+    });
+  }, [activeTab, arenaComparisonResult, inspectedRunDetail]);
+
   // Execute Single Run or Side-by-Side 2-Engine Arena Run
-  const handleExecuteStudioRun = async () => {
-    if (!selectedAgentId || !promptInput.trim()) return;
+  const handleExecuteStudioRun = async (
+    focusResultAfter: boolean = false,
+    retry?: { prompt: string; agentId: string }
+  ) => {
+    const targetAgentId = retry?.agentId ?? selectedAgentId;
+    const runPrompt = retry?.prompt ?? promptInput;
+    if (!targetAgentId || !runPrompt.trim()) return;
     if (!isEngineKeyConfigured(selectedEngine, byokProviders)) {
       handleSelectEngineWithByokGate(selectedEngine, 'global');
       return;
@@ -1152,13 +1367,23 @@ export function App() {
       handleSelectEngineWithByokGate(arenaRightEngine, 'arena-right');
       return;
     }
+    setExecutionIssue(null);
     setRunningStudio(true);
+    setStudioProgress([]);
     setArenaComparisonResult(null);
     clearInspectedRun();
+    if (retry) {
+      setPromptInput(runPrompt);
+      setSelectedAgentId(targetAgentId);
+    }
+    pendingResultRevealRef.current = {
+      target: arenaMode ? 'arena' : 'run',
+      focusAfter: focusResultAfter,
+    };
 
     try {
       const activeAgent =
-        agents.find((a) => a.id === selectedAgentId) ?? agents[0] ?? null;
+        agents.find((a) => a.id === targetAgentId) ?? agents[0] ?? null;
       const activeAgentVersions = agentVersions.filter(
         (v) => v.agentId === activeAgent?.id
       );
@@ -1186,13 +1411,14 @@ export function App() {
         activePersona.role !== 'viewer'
       ) {
         const autoPubRes = await apiFetch(
-          `/api/v1/agents/${selectedAgentId}/publish`,
+          `/api/v1/agents/${targetAgentId}/publish`,
           {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
           }
         );
         if (!autoPubRes.ok) {
+          pendingResultRevealRef.current = null;
           const autoPubBody = await autoPubRes.json().catch(() => ({}));
           notify(
             `Snapshot Publish Required (HTTP ${autoPubRes.status})`,
@@ -1200,21 +1426,27 @@ export function App() {
             autoPubBody?.detail ||
               'Failed to publish immutable Snapshot before starting run.'
           );
+          const message = autoPubBody?.detail || 'Failed to publish the agent snapshot.';
+          setExecutionIssue({
+            message,
+            recovery: getRunRecoveryAdvice('failed', message),
+            kind: getExecutionIssueKind(message),
+          });
           return;
         }
       }
 
       if (!arenaMode) {
         const payload: Record<string, unknown> = {
-          inputPrompt: promptInput.trim(),
-          processImmediately: true,
+          inputPrompt: runPrompt.trim(),
+          processImmediately: false,
           aiEngine: selectedEngine,
         };
-        if (idempotencyKeyInput.trim()) {
+        if (!retry && idempotencyKeyInput.trim()) {
           payload.idempotencyKey = idempotencyKeyInput.trim();
         }
 
-        const res = await apiFetch(`/api/v1/agents/${selectedAgentId}/runs`, {
+        const res = await apiFetch(`/api/v1/agents/${targetAgentId}/runs`, {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify(payload),
@@ -1226,25 +1458,65 @@ export function App() {
             'error',
             `${body?.detail || 'Execution rejected by RBAC or guardrail policy'} • Active Role: ${activePersona.role.toUpperCase()} (${activePersona.permissionsCount}/28) • Logged to Security Audit Ledger.`
           );
+          const message = body?.detail || 'Execution was rejected by a role or policy guardrail.';
+          setExecutionIssue({
+            message,
+            recovery: getRunRecoveryAdvice('failed', message),
+            kind: getExecutionIssueKind(`${body?.code ?? ''} ${message}`),
+          });
           await fetchWorkspace();
+          if (body.data?.run?.id) {
+            pendingResultRevealRef.current = {
+              target: 'run',
+              focusAfter: focusResultAfter,
+              runIds: [body.data.run.id],
+            };
+            setInspectedRunId(body.data.run.id);
+          } else {
+            pendingResultRevealRef.current = null;
+          }
           return;
         }
 
         const createdRunId = body.data?.run?.id;
         const deduplicated = body.data?.deduplicated === true;
-        const runTok = body.data?.run?.totalTokens ?? 0;
+        if (!createdRunId) throw new Error('The server accepted the run but returned no run ID. Refresh run history and retry.');
+        const createdRun = body.data?.run as RunRecord;
+        pendingResultRevealRef.current = {
+          target: 'run',
+          focusAfter: focusResultAfter,
+          runIds: [createdRunId],
+        };
+        setStudioProgress([{
+          id: createdRunId,
+          engine: selectedEngine,
+          status: createdRun.status,
+          phase: createdRun.status === 'queued' ? 'Queued for a worker' : 'Starting run',
+          stepCount: 0,
+          toolCount: 0,
+        }]);
+        setInspectedRunId(createdRunId);
         notify(
-          deduplicated
-            ? `Idempotent Replay Hit! Returned Existing Run ${createdRunId?.slice(0, 8)}`
-            : `Completed Governed Agent Run on Engine "${selectedEngine}"`,
-          'success',
-          deduplicated
-            ? `Idempotency Key "${idempotencyKeyInput.trim()}" prevented duplicate execution & billing • Run ID: ${createdRunId?.slice(0, 12)}`
-            : `Run ID: ${createdRunId?.slice(0, 12)} • Tokens: ${runTok} tok • Grounded RAG citations & tool allowlist verified.`
+          'Run queued',
+          'info',
+          `Run ${createdRunId.slice(0, 8)} is queued on ${selectedEngine}. Progress and trace will update as the worker reports steps.`
         );
         await fetchWorkspace();
-        if (createdRunId) {
-          await inspectRunById(createdRunId);
+        const finishedRun = await pollRunUntilTerminal(createdRunId, selectedEngine);
+        if (finishedRun) {
+          const succeeded = finishedRun.run.status === 'succeeded';
+          notify(
+            succeeded
+              ? deduplicated ? `Existing run returned · ${createdRunId.slice(0, 8)}` : `Agent run complete · ${selectedEngine}`
+              : `Agent run ${finishedRun.run.status} · ${selectedEngine}`,
+            succeeded ? 'success' : 'error',
+            finishedRun.run.errorMessage || `Run ${createdRunId.slice(0, 12)} • ${finishedRun.run.totalTokens} tokens • ${finishedRun.steps.length} recorded steps`
+          );
+          if (!succeeded) {
+            const message = finishedRun.run.errorMessage || `Run ${finishedRun.run.status}`;
+            setExecutionIssue({ message, recovery: getRunRecoveryAdvice(finishedRun.run.status, message), kind: getExecutionIssueKind(message) });
+          }
+          await fetchWorkspace();
         }
       } else {
         // 2-Engine Arena Mode: Execute Left and Right engines in parallel
@@ -1252,21 +1524,21 @@ export function App() {
         const t0Right = performance.now();
 
         const [leftRes, rightRes] = await Promise.all([
-          apiFetch(`/api/v1/agents/${selectedAgentId}/runs`, {
+          apiFetch(`/api/v1/agents/${targetAgentId}/runs`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-              inputPrompt: promptInput.trim(),
-              processImmediately: true,
+              inputPrompt: runPrompt.trim(),
+              processImmediately: false,
               aiEngine: selectedEngine,
             }),
           }),
-          apiFetch(`/api/v1/agents/${selectedAgentId}/runs`, {
+          apiFetch(`/api/v1/agents/${targetAgentId}/runs`, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
             body: JSON.stringify({
-              inputPrompt: promptInput.trim(),
-              processImmediately: true,
+              inputPrompt: runPrompt.trim(),
+              processImmediately: false,
               aiEngine: arenaRightEngine,
             }),
           }),
@@ -1287,33 +1559,121 @@ export function App() {
               'Arena comparison blocked by RBAC or guardrail policy.'
             } • Active Role: ${activePersona.role.toUpperCase()}`
           );
+          const message = leftBody?.detail || rightBody?.detail || 'Arena comparison was rejected by a role or policy guardrail.';
+          setExecutionIssue({
+            message,
+            recovery: getRunRecoveryAdvice('failed', message),
+            kind: getExecutionIssueKind(message),
+          });
           await fetchWorkspace();
+          const partialLeftRun = leftBody.data?.run ?? null;
+          const partialRightRun = rightBody.data?.run ?? null;
+          if (partialLeftRun || partialRightRun) {
+            setArenaComparisonResult({
+              leftEngine: selectedEngine,
+              rightEngine: arenaRightEngine,
+              leftRun: partialLeftRun,
+              rightRun: partialRightRun,
+              leftDurationMs,
+              rightDurationMs,
+            });
+          }
+          const partialRuns = [
+            partialLeftRun ? { run: partialLeftRun as RunRecord, engine: selectedEngine } : null,
+            partialRightRun ? { run: partialRightRun as RunRecord, engine: arenaRightEngine } : null,
+          ].filter((item): item is { run: RunRecord; engine: string } => item !== null);
+          if (partialRuns.length) {
+            pendingResultRevealRef.current = {
+              target: 'arena',
+              focusAfter: focusResultAfter,
+              runIds: partialRuns.map(({ run }) => run.id),
+            };
+            setStudioProgress(partialRuns.map(({ run, engine }) => ({
+              id: run.id,
+              engine,
+              status: run.status,
+              phase: run.status === 'queued' ? 'Queued for a worker' : 'Starting run',
+              stepCount: 0,
+              toolCount: 0,
+            })));
+            setInspectedRunId(partialRuns[0]!.run.id);
+            const [finalLeftResult, finalRightResult] = await Promise.all([
+              partialLeftRun ? pollRunUntilTerminal(partialLeftRun.id, selectedEngine) : Promise.resolve(null),
+              partialRightRun ? pollRunUntilTerminal(partialRightRun.id, arenaRightEngine) : Promise.resolve(null),
+            ]);
+            const finalLeftRun = finalLeftResult?.run ?? partialLeftRun;
+            const finalRightRun = finalRightResult?.run ?? partialRightRun;
+            setArenaComparisonResult({
+              leftEngine: selectedEngine,
+              rightEngine: arenaRightEngine,
+              leftRun: finalLeftRun,
+              rightRun: finalRightRun,
+              leftDurationMs: Math.round(performance.now() - t0Left),
+              rightDurationMs: Math.round(performance.now() - t0Right),
+            });
+            await fetchWorkspace();
+          } else if (!partialLeftRun && !partialRightRun) {
+            pendingResultRevealRef.current = null;
+          }
           return;
         }
 
+        const leftRun = leftBody.data?.run ?? null;
+        const rightRun = rightBody.data?.run ?? null;
+        if (!leftRun?.id || !rightRun?.id) {
+          throw new Error('The comparison was accepted but one engine did not return a run ID. Review run history for the partial result.');
+        }
+        pendingResultRevealRef.current = {
+          target: 'arena',
+          focusAfter: focusResultAfter,
+          runIds: [leftRun.id, rightRun.id],
+        };
         setArenaComparisonResult({
           leftEngine: selectedEngine,
           rightEngine: arenaRightEngine,
-          leftRun: leftBody.data?.run ?? null,
-          rightRun: rightBody.data?.run ?? null,
+          leftRun,
+          rightRun,
           leftDurationMs,
           rightDurationMs,
         });
-        notify(
-          `2-Engine Arena Comparison Complete (${selectedEngine} vs ${arenaRightEngine})`,
-          'success',
-          `Left (${selectedEngine}): ${leftDurationMs}ms / ${leftBody.data?.run?.totalTokens ?? 0} tok • Right (${arenaRightEngine}): ${rightDurationMs}ms / ${rightBody.data?.run?.totalTokens ?? 0} tok`
-        );
+        setStudioProgress([
+          { id: leftRun.id, engine: selectedEngine, status: leftRun.status, phase: 'Queued for a worker', stepCount: 0, toolCount: 0 },
+          { id: rightRun.id, engine: arenaRightEngine, status: rightRun.status, phase: 'Queued for a worker', stepCount: 0, toolCount: 0 },
+        ]);
+        notify('Comparison queued', 'info', `${selectedEngine} and ${arenaRightEngine} are running against the same prompt and published snapshot.`);
+        setInspectedRunId(leftRun.id);
         await fetchWorkspace();
-        if (leftBody.data?.run?.id) {
-          await inspectRunById(leftBody.data.run.id);
+        const [finishedLeft, finishedRight] = await Promise.all([
+          pollRunUntilTerminal(leftRun.id, selectedEngine),
+          pollRunUntilTerminal(rightRun.id, arenaRightEngine),
+        ]);
+        const finalLeftRun = finishedLeft?.run ?? leftRun;
+        const finalRightRun = finishedRight?.run ?? rightRun;
+        const allRunsSucceeded = finalLeftRun.status === 'succeeded' && finalRightRun.status === 'succeeded';
+        setArenaComparisonResult({
+          leftEngine: selectedEngine,
+          rightEngine: arenaRightEngine,
+          leftRun: finalLeftRun,
+          rightRun: finalRightRun,
+          leftDurationMs: Math.round(performance.now() - t0Left),
+          rightDurationMs: Math.round(performance.now() - t0Right),
+        });
+        notify(
+          allRunsSucceeded ? 'Arena comparison complete' : 'Arena comparison finished with an error',
+          allRunsSucceeded ? 'success' : 'error',
+          `${selectedEngine}: ${finalLeftRun.status} • ${arenaRightEngine}: ${finalRightRun.status}`
+        );
+        if (!allRunsSucceeded) {
+          const message = finalLeftRun.errorMessage || finalRightRun.errorMessage || 'One or more comparison runs failed.';
+          setExecutionIssue({ message, recovery: getRunRecoveryAdvice('failed', message), kind: getExecutionIssueKind(message) });
         }
+        await fetchWorkspace();
       }
     } catch (err) {
-      notify(
-        err instanceof Error ? err.message : 'Failed to execute agent run',
-        'error'
-      );
+      pendingResultRevealRef.current = null;
+      const message = err instanceof Error ? err.message : 'Failed to execute agent run';
+      setExecutionIssue({ message, recovery: getRunRecoveryAdvice('failed', message), kind: getExecutionIssueKind(message) });
+      notify(message, 'error');
     } finally {
       setRunningStudio(false);
     }
@@ -1641,6 +2001,44 @@ export function App() {
       latestPublishedSnapshot &&
       selectedAgent.draftSystemPrompt !== latestPublishedSnapshot.systemPrompt
   );
+  const draftToolsChanged = Boolean(
+    selectedAgent &&
+      latestPublishedSnapshot &&
+      JSON.stringify([...(selectedAgent.draftToolAllowlist ?? [])].sort()) !==
+        JSON.stringify([...(latestPublishedSnapshot.toolAllowlist ?? [])].sort())
+  );
+  const draftChangesPending =
+    Boolean(selectedAgent) &&
+    (!latestPublishedSnapshot || draftPromptChanged || draftToolsChanged);
+
+  const filteredRuns = useMemo(() => {
+    const query = runSearch.trim().toLowerCase();
+    return runs.filter((run) => {
+      const matchesStatus =
+        runStatusFilter === 'all' ||
+        (runStatusFilter === 'active' && ['queued', 'running', 'waiting_approval'].includes(run.status)) ||
+        run.status === runStatusFilter;
+      const matchesAgent = runAgentFilter === 'all' || run.agentId === runAgentFilter;
+      const timeWindowMs = runTimeFilter === 'day' ? 24 * 60 * 60 * 1000 : runTimeFilter === 'week' ? 7 * 24 * 60 * 60 * 1000 : runTimeFilter === 'month' ? 30 * 24 * 60 * 60 * 1000 : null;
+      const createdAtMs = new Date(run.createdAt).getTime();
+      const matchesTime = timeWindowMs === null || (Number.isFinite(createdAtMs) && Date.now() - createdAtMs <= timeWindowMs);
+      const agent = agents.find((candidate) => candidate.id === run.agentId);
+      const matchesSearch =
+        !query ||
+        run.inputPrompt.toLowerCase().includes(query) ||
+        (agent?.name ?? '').toLowerCase().includes(query) ||
+        run.id.toLowerCase().includes(query);
+      return matchesStatus && matchesAgent && matchesTime && matchesSearch;
+    });
+  }, [agents, runAgentFilter, runSearch, runStatusFilter, runTimeFilter, runs]);
+
+  const arenaDifferences = useMemo(
+    () => getArenaLineDifferences(
+      arenaComparisonResult?.leftRun?.finalOutput || arenaComparisonResult?.leftRun?.errorMessage || '',
+      arenaComparisonResult?.rightRun?.finalOutput || arenaComparisonResult?.rightRun?.errorMessage || ''
+    ),
+    [arenaComparisonResult]
+  );
 
   useEffect(() => {
     setDraftPromptInput(selectedAgent?.draftSystemPrompt ?? '');
@@ -1709,8 +2107,9 @@ export function App() {
       {toast && (
         <div
           className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-4 pointer-events-none"
-          role="status"
-          aria-live="polite"
+          role={toast.tone === 'error' ? 'alert' : 'status'}
+          aria-live={toast.tone === 'error' ? 'assertive' : 'polite'}
+          aria-atomic="true"
         >
           <div
             onMouseEnter={() => setToastPaused(true)}
@@ -2405,9 +2804,9 @@ export function App() {
                 <span>Draft</span>
               </li>
               <span className="ordaris-path-rule" aria-hidden="true" />
-              <li className={`ordaris-path-step ${draftPromptChanged ? 'is-pending' : latestPublishedSnapshot ? 'is-ready' : ''}`}>
+              <li className={`ordaris-path-step ${draftChangesPending ? 'is-pending' : latestPublishedSnapshot ? 'is-ready' : ''}`}>
                 <span className="ordaris-path-index">02</span>
-                <span>{draftPromptChanged ? 'Publish changes' : latestPublishedSnapshot ? `Snapshot v${latestPublishedSnapshot.versionNumber}` : 'Publish'}</span>
+                <span>{draftChangesPending ? 'Publish changes' : latestPublishedSnapshot ? `Snapshot v${latestPublishedSnapshot.versionNumber}` : 'Publish'}</span>
               </li>
               <span className="ordaris-path-rule" aria-hidden="true" />
               <li className={`ordaris-path-step ${runningStudio ? 'is-running' : inspectedRunDetail ? 'is-ready' : ''}`}>
@@ -2433,9 +2832,9 @@ export function App() {
                     {selectedAgent && (
                       <p className="ordaris-agent-status">
                         {latestPublishedSnapshot ? `Snapshot v${latestPublishedSnapshot.versionNumber}` : 'No published snapshot'}
-                        <span className={draftPromptChanged ? 'text-amber-300' : 'text-emerald-300'}>
+                        <span className={draftChangesPending ? 'text-amber-300' : 'text-emerald-300'}>
                           {latestPublishedSnapshot
-                            ? draftPromptChanged ? 'Draft changes not published' : 'Draft matches snapshot'
+                            ? draftChangesPending ? 'Draft changes not published' : 'Draft matches snapshot'
                             : 'Draft not yet published'}
                         </span>
                       </p>
@@ -2515,12 +2914,16 @@ export function App() {
                   <div className="p-4 sm:p-5 space-y-3.5 text-xs bg-[#09090B]/60">
                     <div className="ordaris-agent-meta">
                       <span>{selectedAgentVersions.length || selectedAgent.latestVersionNumber || 0} published versions</span>
-                      <span className={draftPromptChanged ? 'text-amber-300' : 'text-zinc-400'}>
+                      <span className={draftChangesPending ? 'text-amber-300' : 'text-zinc-400'}>
                         {updatingAllowlist
                           ? 'Saving & pinning vN+1...'
-                          : draftPromptChanged
-                            ? 'Run uses published prompt until next publish'
-                            : 'Draft is aligned with published prompt'}
+                          : !latestPublishedSnapshot
+                            ? 'First run will publish this draft as Snapshot v1'
+                          : draftToolsChanged
+                              ? `Next run publishes tool access as Snapshot v${latestPublishedSnapshot.versionNumber + 1}`
+                              : draftPromptChanged
+                                ? `Next run uses Snapshot v${latestPublishedSnapshot.versionNumber} until you publish the prompt`
+                              : `Next run uses published Snapshot v${latestPublishedSnapshot.versionNumber}`}
                       </span>
                     </div>
 
@@ -2800,10 +3203,31 @@ export function App() {
                   </p>
                 )}
 
+                {executionIssue && (
+                  <section className="border border-rose-500/40 bg-rose-950/20 px-3.5 py-3 space-y-2" role="alert" aria-atomic="true">
+                    <div className="text-xs font-semibold text-rose-300">Run needs attention</div>
+                    <p className="text-xs text-zinc-200 leading-relaxed">{executionIssue.message}</p>
+                    <p className="text-[11px] text-zinc-400">Next step: {executionIssue.recovery}</p>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (executionIssue.kind === 'provider') setByokDrawerOpen(true);
+                        else if (executionIssue.kind === 'permissions') setActiveTab('governance');
+                        else void handleExecuteStudioRun(false);
+                      }}
+                      className="min-h-9 px-3 border border-rose-400/50 text-rose-200 hover:bg-rose-500/10 text-xs font-semibold"
+                    >
+                      {executionIssue.kind === 'provider' ? 'Open BYOK Vault' : executionIssue.kind === 'permissions' ? 'Review governance' : 'Retry run'}
+                    </button>
+                  </section>
+                )}
+
                 <button
                   type="button"
                   disabled={runningStudio || !selectedAgentId || !promptInput.trim()}
-                  onClick={handleExecuteStudioRun}
+                  onClick={(event) => {
+                    void handleExecuteStudioRun(event.detail === 0);
+                  }}
                   className="ordaris-primary-action w-full h-10 px-4 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-60 text-zinc-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition"
                 >
                   {runningStudio ? (
@@ -2822,6 +3246,45 @@ export function App() {
                         : 'Run agent'}
                   </span>
                 </button>
+
+                {studioProgress.length > 0 && (
+                  <section className="border border-zinc-800 bg-[#09090B] divide-y divide-zinc-800" aria-label="Run progress">
+                    <div className="px-3.5 py-2 text-[10px] font-mono uppercase tracking-[0.14em] text-zinc-500">
+                      {runningStudio ? 'Live run progress' : 'Latest run progress'}
+                    </div>
+                    {studioProgress.map((progress) => {
+                      const isActive = ['queued', 'running', 'waiting_approval'].includes(progress.status);
+                      const isSuccess = progress.status === 'succeeded';
+                      const isWaiting = progress.status === 'waiting_approval';
+                      return (
+                        <div key={progress.id} className="px-3.5 py-3 flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 text-xs">
+                              <span className={`font-mono font-semibold ${isSuccess ? 'text-emerald-300' : isActive || isWaiting ? 'text-amber-300' : 'text-rose-300'}`}>
+                                {progress.engine}
+                              </span>
+                              <span className="text-zinc-600">/</span>
+                              <span role="status" aria-atomic="true" className="text-zinc-200">{progress.phase}</span>
+                            </div>
+                            <p className="mt-1 text-[11px] text-zinc-500">
+                              {progress.stepCount} {progress.stepCount === 1 ? 'step' : 'steps'} · {progress.toolCount} {progress.toolCount === 1 ? 'tool' : 'tools'} · Run {progress.id.slice(0, 8)}
+                            </p>
+                          </div>
+                          {isActive && (
+                            <button
+                              type="button"
+                              disabled={cancelingRunIds.includes(progress.id)}
+                              onClick={() => void handleCancelRun(progress.id)}
+                              className="min-h-9 px-3 border border-zinc-700 hover:border-rose-400/60 text-xs text-zinc-300 hover:text-rose-200 disabled:opacity-50"
+                            >
+                              {cancelingRunIds.includes(progress.id) ? 'Stopping…' : 'Cancel'}
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </section>
+                )}
 
                 <div className="ordaris-preflight" aria-live="polite">
                   <span>Estimate</span>
@@ -2876,13 +3339,13 @@ export function App() {
                   <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Provider</dt><dd className="mt-0.5 text-blue-300">{providerResolutionLabel}</dd></div>
                   <div className="col-span-2"><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Run tool allowlist</dt><dd className="mt-1 flex flex-wrap gap-1.5">{(latestPublishedSnapshot?.toolAllowlist ?? selectedAgent?.draftToolAllowlist ?? []).length ? (latestPublishedSnapshot?.toolAllowlist ?? selectedAgent?.draftToolAllowlist ?? []).map((tool) => <code key={tool} className="rounded bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-200">{tool}</code>) : <span className="text-zinc-400">No tools enabled</span>}</dd></div>
                 </dl>
-                {draftPromptChanged && <p className="border-t border-zinc-800 pt-2 text-[11px] text-amber-300">Draft differs from the published snapshot. Publish to include those instructions in the next run.</p>}
+                {draftChangesPending && <p className="border-t border-zinc-800 pt-2 text-[11px] text-amber-300">{!latestPublishedSnapshot ? 'The first run publishes the current draft as Snapshot v1.' : draftToolsChanged ? 'Tool access changes are published before execution. Prompt edits remain draft-only until you publish them.' : 'The next run uses the published prompt. Publish to include the current draft instructions.'}</p>}
               </aside>
               {/* Side-by-Side 2-Engine Arena Results (When Active) */}
               {arenaComparisonResult && (
-                <div className="ordaris-arena-result bg-[#111113] border border-zinc-700 rounded-xl p-5 space-y-4">
+                <div ref={arenaResultRef} className="ordaris-arena-result bg-[#111113] border border-zinc-700 rounded-xl p-5 space-y-4">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+                    <h3 data-result-heading tabIndex={-1} className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                       <Columns className="w-4 h-4 text-zinc-200" />
                       <span>
                         2-Engine Arena Side-by-Side Comparison ({arenaComparisonResult.leftEngine}{' '}
@@ -2908,8 +3371,12 @@ export function App() {
                           {arenaComparisonResult.leftRun?.totalTokens ?? 0} tok
                         </span>
                       </div>
+                      <div className={`text-[10px] font-mono uppercase tracking-wider ${arenaComparisonResult.leftRun ? getRunStatusTextTone(arenaComparisonResult.leftRun.status) : 'text-amber-300'}`}>
+                        {arenaComparisonResult.leftRun?.status ?? 'No run returned'}
+                      </div>
                       <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
                         {arenaComparisonResult.leftRun?.finalOutput ||
+                          arenaComparisonResult.leftRun?.errorMessage ||
                           'No output returned'}
                       </div>
                     </div>
@@ -2923,42 +3390,117 @@ export function App() {
                           {arenaComparisonResult.rightRun?.totalTokens ?? 0} tok
                         </span>
                       </div>
+                      <div className={`text-[10px] font-mono uppercase tracking-wider ${arenaComparisonResult.rightRun ? getRunStatusTextTone(arenaComparisonResult.rightRun.status) : 'text-amber-300'}`}>
+                        {arenaComparisonResult.rightRun?.status ?? 'No run returned'}
+                      </div>
                       <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto">
                         {arenaComparisonResult.rightRun?.finalOutput ||
+                          arenaComparisonResult.rightRun?.errorMessage ||
                           'No output returned'}
                       </div>
                     </div>
                   </div>
+                  <details className="border-t border-zinc-800 pt-3">
+                    <summary className="cursor-pointer text-xs text-zinc-300 hover:text-white">
+                      Differences · {arenaDifferences.leftOnly.length + arenaDifferences.rightOnly.length} unique {arenaDifferences.leftOnly.length + arenaDifferences.rightOnly.length === 1 ? 'line' : 'lines'}
+                    </summary>
+                    {arenaDifferences.leftOnly.length + arenaDifferences.rightOnly.length === 0 ? (
+                      <p className="mt-3 text-xs text-zinc-400">No line-level differences found.</p>
+                    ) : (
+                      <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {[
+                          { engine: arenaComparisonResult.leftEngine, lines: arenaDifferences.leftOnly },
+                          { engine: arenaComparisonResult.rightEngine, lines: arenaDifferences.rightOnly },
+                        ].map(({ engine, lines }) => (
+                          <div key={engine} className="min-w-0 border-l-2 border-amber-400/70 pl-3">
+                            <div className="text-[10px] font-mono uppercase tracking-wider text-amber-300">Only in {engine}</div>
+                            {lines.length ? (
+                              <ul className="mt-2 space-y-1.5">
+                                {lines.map((line, index) => <li key={`${index}-${line}`} className="text-xs text-zinc-200 whitespace-pre-wrap break-words">{line}</li>)}
+                              </ul>
+                            ) : <p className="mt-2 text-xs text-zinc-500">No unique lines.</p>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </details>
                 </div>
               )}
 
               {/* Run History + Single-Elevation Hairline Execution Trace & SSE Inspector */}
-              <div className="ordaris-run-result-card bg-[#111113] border border-zinc-800 rounded-xl divide-y divide-zinc-800 overflow-hidden">
+              <div ref={runResultRef} className="ordaris-run-result-card bg-[#111113] border border-zinc-800 rounded-xl divide-y divide-zinc-800 overflow-hidden">
                 {/* 1. Top Inspector Header Bar */}
                 <div className="p-4 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="text-[11px] font-mono text-zinc-400">
                       Selected run
                     </div>
-                    <h3 className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5">
+                    <h3 data-result-heading tabIndex={-1} className="text-sm sm:text-base font-bold text-white tracking-tight mt-0.5">
                       Result and execution trace
                     </h3>
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
-                    <select
-                      id="inspect-run-select"
-                      aria-label="Select Run to Inspect"
-                      value={inspectedRunId ?? ''}
-                      onChange={(e) => setInspectedRunId(e.target.value)}
-                      className="h-8 bg-[#09090B] border border-zinc-800 hover:border-zinc-700 rounded-lg px-2.5 text-xs font-mono text-zinc-200 transition-colors"
-                    >
-                      {runs.map((r, idx) => (
-                        <option key={r.id} value={r.id}>
-                          #{runs.length - idx} · Run {r.id.slice(0, 8)} · {r.status.toUpperCase()} · {r.totalTokens} tok
-                        </option>
-                      ))}
+                    <span className="text-[10px] font-mono text-zinc-500">{filteredRuns.length} / {runs.length} runs</span>
+                  </div>
+                </div>
+
+                <div className="p-3 sm:p-4 space-y-3 bg-[#0c0c0e]">
+                  <div className="grid grid-cols-1 sm:grid-cols-[minmax(140px,1fr)_auto_auto_auto] gap-2">
+                    <label className="sr-only" htmlFor="run-history-search">Search run history</label>
+                    <input
+                      id="run-history-search"
+                      type="search"
+                      value={runSearch}
+                      onChange={(event) => setRunSearch(event.target.value)}
+                      placeholder="Search prompt, agent, or run ID"
+                      className="h-9 min-w-0 bg-[#09090B] border border-zinc-800 px-3 text-xs text-zinc-200 placeholder:text-zinc-600"
+                    />
+                    <label className="sr-only" htmlFor="run-status-filter">Filter runs by status</label>
+                    <select id="run-status-filter" value={runStatusFilter} onChange={(event) => setRunStatusFilter(event.target.value as typeof runStatusFilter)} className="h-9 bg-[#09090B] border border-zinc-800 px-2.5 text-xs text-zinc-300">
+                      <option value="all">All statuses</option>
+                      <option value="active">Active</option>
+                      <option value="succeeded">Succeeded</option>
+                      <option value="failed">Failed</option>
                     </select>
+                    <label className="sr-only" htmlFor="run-agent-filter">Filter runs by agent</label>
+                    <select id="run-agent-filter" value={runAgentFilter} onChange={(event) => setRunAgentFilter(event.target.value)} className="h-9 bg-[#09090B] border border-zinc-800 px-2.5 text-xs text-zinc-300">
+                      <option value="all">All agents</option>
+                      {agents.map((agent) => <option key={agent.id} value={agent.id}>{agent.name}</option>)}
+                    </select>
+                    <label className="sr-only" htmlFor="run-time-filter">Filter runs by time</label>
+                    <select id="run-time-filter" value={runTimeFilter} onChange={(event) => setRunTimeFilter(event.target.value as typeof runTimeFilter)} className="h-9 bg-[#09090B] border border-zinc-800 px-2.5 text-xs text-zinc-300">
+                      <option value="all">Any time</option>
+                      <option value="day">Last 24 hours</option>
+                      <option value="week">Last 7 days</option>
+                      <option value="month">Last 30 days</option>
+                    </select>
+                  </div>
+                  <div className="max-h-52 overflow-y-auto divide-y divide-zinc-800 border-y border-zinc-800" role="list" aria-label="Recent agent runs">
+                    {filteredRuns.slice(0, 8).map((run) => {
+                      const agentName = agents.find((agent) => agent.id === run.agentId)?.name ?? 'Unknown agent';
+                      const statusTone = run.status === 'succeeded' ? 'text-emerald-300' : ['queued', 'running', 'waiting_approval'].includes(run.status) ? 'text-amber-300' : 'text-rose-300';
+                      const statusDot = run.status === 'succeeded' ? 'bg-emerald-300' : ['queued', 'running', 'waiting_approval'].includes(run.status) ? 'bg-amber-300' : 'bg-rose-300';
+                      return (
+                        <button
+                          key={run.id}
+                          type="button"
+                          role="listitem"
+                          aria-pressed={inspectedRunId === run.id}
+                          onClick={() => setInspectedRunId(run.id)}
+                          className={`w-full min-h-12 px-2.5 py-2 flex items-center gap-3 text-left hover:bg-white/[0.03] ${inspectedRunId === run.id ? 'bg-white/[0.04]' : ''}`}
+                        >
+                          <span className={`w-1.5 h-1.5 shrink-0 ${statusDot}`} aria-hidden="true" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs text-zinc-200">{run.inputPrompt || 'Empty prompt'}</span>
+                            <span className="mt-0.5 block truncate text-[10px] text-zinc-500">{agentName} · {run.id.slice(0, 8)} · {new Date(run.createdAt).toLocaleString()}</span>
+                          </span>
+                          <span className={`shrink-0 text-[10px] font-mono uppercase ${statusTone}`}>{run.status}</span>
+                        </button>
+                      );
+                    })}
+                    {filteredRuns.length === 0 && <p className="px-2.5 py-4 text-xs text-zinc-500">No runs match these filters.</p>}
+                    {filteredRuns.length > 8 && <p className="px-2.5 py-2 text-[10px] text-zinc-500">Showing 8 of {filteredRuns.length}. Narrow the search to find a run.</p>}
                   </div>
                 </div>
 
@@ -2969,11 +3511,7 @@ export function App() {
                       <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono tabular-nums">
                         <div className="flex flex-wrap items-center gap-2 text-zinc-400">
                           <span
-                            className={`font-semibold uppercase ${
-                              inspectedRunDetail.run.status === 'succeeded'
-                                ? 'text-emerald-400'
-                                : 'text-rose-400'
-                            }`}
+                            className={`font-semibold uppercase ${getRunStatusTextTone(inspectedRunDetail.run.status)}`}
                           >
                             {inspectedRunDetail.run.status === 'succeeded'
                               ? '✓ Succeeded'
@@ -3037,8 +3575,8 @@ export function App() {
                         </div>
 
                         <div className="p-3.5 rounded-lg bg-[#09090B] border border-zinc-800 space-y-1">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-emerald-400 font-semibold">
-                            Grounded Final Response
+                          <div className={`text-[10px] font-mono uppercase tracking-wider font-semibold ${getRunStatusTextTone(inspectedRunDetail.run.status)}`}>
+                            {inspectedRunDetail.run.status === 'succeeded' ? 'Run output' : isTerminalRunStatus(inspectedRunDetail.run.status) ? 'Run error' : inspectedRunDetail.run.status.replace('_', ' ')}
                           </div>
                           <div className="text-xs sm:text-sm text-zinc-100 whitespace-pre-wrap leading-relaxed">
                             {inspectedRunDetail.run.finalOutput ||
@@ -3046,6 +3584,29 @@ export function App() {
                               'Run in progress...'}
                           </div>
                         </div>
+                        {inspectedRunDetail.run.status !== 'succeeded' && isTerminalRunStatus(inspectedRunDetail.run.status) && (() => {
+                          const message = inspectedRunDetail.run.errorMessage || `Run ${inspectedRunDetail.run.status}`;
+                          const recoveryKind = getExecutionIssueKind(message);
+                          return (
+                            <div className="border-l-2 border-rose-500/70 pl-3 py-1 space-y-2">
+                              <p className="text-xs text-zinc-300">Next step: {getRunRecoveryAdvice(inspectedRunDetail.run.status, message)}</p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (recoveryKind === 'provider') setByokDrawerOpen(true);
+                                  else if (recoveryKind === 'permissions') setActiveTab('governance');
+                                  else void handleExecuteStudioRun(false, {
+                                    prompt: inspectedRunDetail.run.inputPrompt,
+                                    agentId: inspectedRunDetail.run.agentId,
+                                  });
+                                }}
+                                className="min-h-9 px-3 border border-zinc-700 hover:border-zinc-500 text-xs text-zinc-200"
+                              >
+                                {recoveryKind === 'provider' ? 'Open BYOK Vault' : recoveryKind === 'permissions' ? 'Review governance' : 'Run again'}
+                              </button>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
 
@@ -3819,7 +4380,7 @@ export function App() {
             onWorkspaceRefresh={fetchWorkspace}
             onNotify={notify}
             onSelectRunToInspect={(runId) => {
-              void inspectRunById(runId);
+              setInspectedRunId(runId);
               setActiveTab('studio');
               notify(
                 'Opened Run Trace in Agent Studio',
@@ -3847,7 +4408,7 @@ export function App() {
             onWorkspaceRefresh={fetchWorkspace}
             onNotify={notify}
             onSelectRunToInspect={(runId) => {
-              void inspectRunById(runId);
+              setInspectedRunId(runId);
               setActiveTab('studio');
               notify(
                 'Opened Run Trace in Agent Studio',
