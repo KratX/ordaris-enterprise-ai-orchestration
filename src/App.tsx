@@ -1704,7 +1704,7 @@ export function App() {
   const configuredByokCount = byokProviders.filter((p) => p.configured).length;
 
   return (
-    <div className="min-h-screen bg-[#09090B] text-zinc-100 flex flex-col font-sans selection:bg-white/20 selection:text-white ordaris-comfortable">
+    <div className="ordaris-shell min-h-screen bg-[#09090B] text-zinc-100 flex flex-col font-sans selection:bg-white/20 selection:text-white ordaris-comfortable">
       {/* TOP FLOATING POPUP NOTIFICATION WITH STRUCTURED DETAILS */}
       {toast && (
         <div
@@ -1847,7 +1847,7 @@ export function App() {
       )}
 
       {/* TOP ENTERPRISE COMMAND HEADER */}
-      <header className="sticky top-0 z-30 bg-[#09090B]/95 backdrop-blur-md border-b border-zinc-800 px-5 lg:px-8 py-2.5 relative">
+      <header className="ordaris-command-header sticky top-0 z-30 bg-[#09090B]/95 backdrop-blur-md border-b border-zinc-800 px-5 lg:px-8 py-2.5 relative">
         {(loadingWorkspace ||
           runningStudio ||
           publishingAgent ||
@@ -1885,7 +1885,7 @@ export function App() {
           </div>
 
           {/* Right Controls: Download Archive, 8-Persona Switcher, Alerts, BYOK Vault, 3-Choice Reset */}
-          <div className="flex flex-wrap xl:flex-nowrap items-center gap-1.5 shrink-0">
+          <div className="ordaris-header-controls flex flex-wrap xl:flex-nowrap items-center gap-1.5 min-w-0 w-full xl:w-auto">
 
             {/* 8-Persona Multi-Tenant RBAC Switcher */}
             <div className="h-8 flex items-center bg-zinc-900/90 border border-zinc-800 hover:border-zinc-700 rounded-lg px-2 gap-1.5 shrink-0 transition-colors">
@@ -2250,9 +2250,9 @@ export function App() {
         )}
       </div>
 
-      <div className="flex-1 w-full max-w-[1800px] mx-auto flex flex-col lg:flex-row items-stretch">
+      <div className="ordaris-app-frame flex-1 w-full max-w-[1800px] mx-auto flex flex-col lg:flex-row items-stretch">
       {/* 5-PILLAR NAVIGATION BAR (HIGHLIGHTED MONOCHROME BOX TABS) */}
-      <aside className="relative w-full lg:w-[220px] xl:w-[236px] lg:shrink-0 lg:sticky lg:top-[72px] lg:self-start lg:h-[calc(100vh-72px)] border-b lg:border-b-0 lg:border-r border-zinc-800 bg-[#0c0c0e] lg:overflow-y-auto">
+      <aside className="ordaris-nav-rail relative w-full lg:w-[220px] xl:w-[236px] lg:shrink-0 lg:sticky lg:top-[72px] lg:self-start lg:h-[calc(100vh-72px)] border-b lg:border-b-0 lg:border-r border-zinc-800 bg-[#0c0c0e] lg:overflow-y-auto">
         <div className="px-3 py-2.5 lg:py-4 space-y-2 lg:space-y-3">
           <nav
             className="ordaris-mobile-nav flex flex-row lg:flex-col items-stretch gap-1 overflow-x-auto lg:overflow-visible"
@@ -2269,7 +2269,7 @@ export function App() {
               }`}
               aria-current={activeTab === 'studio' ? 'page' : undefined}
             >
-              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <Cpu className="w-3.5 h-3.5 shrink-0" />
               <span>Agent Studio</span>
             </button>
 
@@ -2341,7 +2341,7 @@ export function App() {
           </nav>
 
           {/* Active AI Engine Selector — Contained Within Viewport */}
-          <div className="mt-2 lg:mt-4 pt-2 lg:pt-3 border-t border-zinc-800 space-y-2">
+          <div className="ordaris-engine-control mt-2 lg:mt-4 pt-2 lg:pt-3 border-t border-zinc-800 space-y-2">
             <label htmlFor="global-engine-selector" className="block px-2 text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500">Active engine</label>
             <select
               id="global-engine-selector"
@@ -2391,134 +2391,131 @@ export function App() {
       </aside>
 
       {/* MAIN TAB WORKSPACE */}
-      <main className="flex-1 min-w-0 w-full max-w-[1564px] px-4 sm:px-5 xl:px-7 py-5 lg:py-7">
+      <main className="ordaris-workspace flex-1 min-w-0 w-full max-w-[1564px] px-4 sm:px-5 xl:px-7 py-5 lg:py-7">
         {activeTab === 'studio' && (
           <div className="max-w-[1480px] mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 xl:gap-7 items-start">
+          <section className="ordaris-workbench-heading" aria-labelledby="workbench-title">
+            <div className="ordaris-workbench-copy">
+              <h1 id="workbench-title">Build and run agents</h1>
+              <p>Shape a draft, publish the version you trust, then follow its execution from prompt to result.</p>
+            </div>
+            <ol className="ordaris-execution-path" aria-label="Agent execution path">
+              <li className="ordaris-path-step">
+                <span className="ordaris-path-index">01</span>
+                <span>Draft</span>
+              </li>
+              <span className="ordaris-path-rule" aria-hidden="true" />
+              <li className={`ordaris-path-step ${draftPromptChanged ? 'is-pending' : latestPublishedSnapshot ? 'is-ready' : ''}`}>
+                <span className="ordaris-path-index">02</span>
+                <span>{draftPromptChanged ? 'Publish changes' : latestPublishedSnapshot ? `Snapshot v${latestPublishedSnapshot.versionNumber}` : 'Publish'}</span>
+              </li>
+              <span className="ordaris-path-rule" aria-hidden="true" />
+              <li className={`ordaris-path-step ${runningStudio ? 'is-running' : inspectedRunDetail ? 'is-ready' : ''}`}>
+                <span className="ordaris-path-index">03</span>
+                <span>{runningStudio ? 'Running' : 'Run'}</span>
+              </li>
+              <span className="ordaris-path-rule" aria-hidden="true" />
+              <li className={`ordaris-path-step ${inspectedRunDetail ? 'is-ready' : ''}`}>
+                <span className="ordaris-path-index">04</span>
+                <span>Trace</span>
+              </li>
+            </ol>
+          </section>
+          <div className="ordaris-studio-grid grid grid-cols-1 lg:grid-cols-12 gap-4 xl:gap-6 items-start">
             {/* PRIMARY WORK AREA: AGENT, PROMPT, GOVERNED RUN */}
-            <div className="lg:col-span-7 space-y-4">
-              {/* Agent Selector & Snapshot Panel — Structured Card with Alabaster White Left Accent */}
-              <div className="bg-[#111113] border border-zinc-800 border-l-4 border-l-zinc-100 rounded-xl divide-y divide-zinc-800 overflow-hidden shadow-sm">
-                <div className="p-4 sm:p-5 space-y-3.5">
-                  <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2.5 py-1 rounded-md bg-zinc-100 text-zinc-950 border border-white text-[11px] font-mono font-bold uppercase">
-                        Agent
-                      </span>
-                      <span className="px-2 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300">
-                        {activePersona.orgName}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <button
-                        type="button"
-                        disabled={activePersona.role === 'viewer'}
-                        onClick={() => setShowCreateAgentModal(true)}
-                        className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:opacity-40 text-xs font-medium text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                      >
-                        <Plus className="w-3.5 h-3.5 shrink-0" />
-                        <span>New Agent</span>
-                      </button>
-                      <button
-                        type="button"
-                        disabled={
-                          activePersona.role === 'viewer' ||
-                          publishingAgent ||
-                          !selectedAgent
-                        }
-                        onClick={handlePublishAgentVersion}
-                        className="h-8 px-3 rounded-lg bg-zinc-100 hover:bg-white border border-white disabled:opacity-40 text-xs font-bold text-zinc-950 flex items-center gap-1.5 whitespace-nowrap shrink-0"
-                      >
-                        {publishingAgent ? (
-                          <span
-                            className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
-                            aria-hidden="true"
-                          />
-                        ) : (
-                          <Lock className="w-3.5 h-3.5 shrink-0" />
-                        )}
-                        <span>
-                          {publishingAgent ? 'Publishing...' : 'Publish vN+1'}
+            <div className="ordaris-builder-stack lg:col-span-7 space-y-4">
+              {/* Agent definition and immutable snapshot controls */}
+              <div className="ordaris-agent-panel bg-[#111113] border border-zinc-800 rounded-xl divide-y divide-zinc-800 overflow-hidden">
+                <div className="ordaris-agent-heading p-4 sm:p-5">
+                  <div className="min-w-0">
+                    <div className="ordaris-panel-kicker">Agent / {activePersona.orgName}</div>
+                    <h2 className="ordaris-agent-name">{selectedAgent?.name ?? 'Choose an agent'}</h2>
+                    {selectedAgent && (
+                      <p className="ordaris-agent-status">
+                        {latestPublishedSnapshot ? `Snapshot v${latestPublishedSnapshot.versionNumber}` : 'No published snapshot'}
+                        <span className={draftPromptChanged ? 'text-amber-300' : 'text-emerald-300'}>
+                          {latestPublishedSnapshot
+                            ? draftPromptChanged ? 'Draft changes not published' : 'Draft matches snapshot'
+                            : 'Draft not yet published'}
                         </span>
-                      </button>
-                    </div>
+                      </p>
+                    )}
                   </div>
-
-                  <div>
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="text-[10px] font-mono uppercase tracking-[0.16em] text-zinc-500 mb-1">Agent Studio</div>
-                        <h1 className="text-lg sm:text-xl font-semibold tracking-tight text-white mb-2.5">
-                          {selectedAgent?.name ?? 'Choose an agent'}
-                        </h1>
-                        {selectedAgent && (
-                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-zinc-400">
-                            <span className="text-zinc-200">{latestPublishedSnapshot ? `Published snapshot v${latestPublishedSnapshot.versionNumber}` : 'No published snapshot'}</span>
-                            <span className={draftPromptChanged ? 'text-amber-300' : 'text-emerald-300'}>
-                              {latestPublishedSnapshot
-                                ? draftPromptChanged ? 'Draft instructions differ' : 'Draft matches published prompt'
-                                : 'Draft not yet published'}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      {selectedAgent && activePersona.role !== 'viewer' && (
-                        <button
-                          type="button"
-                          onClick={() => setShowDraftEditor((open) => !open)}
-                          className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-medium text-zinc-200"
-                          aria-expanded={showDraftEditor}
-                        >
-                          {showDraftEditor ? 'Close draft editor' : 'Edit draft instructions'}
-                        </button>
-                      )}
-                    </div>
-                    <select
-                      aria-label="Select Active Agent"
-                      disabled={agents.length === 0}
-                      value={selectedAgentId}
-                      onChange={(e) => {
-                        clearInspectedRun();
-                        setSelectedAgentId(e.target.value);
-                      }}
-                      className="w-full h-10 bg-[#09090B] border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 text-xs sm:text-sm font-semibold text-white cursor-pointer transition-colors"
+                  <div className="ordaris-agent-actions">
+                    <button
+                      type="button"
+                      disabled={activePersona.role === 'viewer'}
+                      onClick={() => setShowCreateAgentModal(true)}
+                      className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 disabled:opacity-40 text-xs font-medium text-zinc-200 flex items-center gap-1.5 whitespace-nowrap shrink-0"
                     >
-                      {agents.length === 0 && <option value="">No agents available</option>}
-                      {agents.map((ag) => (
-                        <option key={ag.id} value={ag.id}>
-                          {ag.name} ({ag.slug}) —{' '}
-                          {(ag.latestVersionNumber ?? 0) > 0
-                            ? `Snapshot v${ag.latestVersionNumber}`
-                            : 'Draft (Auto-pins v1 on Run)'}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                      <Plus className="w-3.5 h-3.5 shrink-0" />
+                      <span>New Agent</span>
+                    </button>
+                    <button
+                      type="button"
+                      disabled={
+                        activePersona.role === 'viewer' ||
+                        publishingAgent ||
+                        !selectedAgent
+                      }
+                      onClick={handlePublishAgentVersion}
+                      className="h-8 px-3 rounded-lg bg-zinc-100 hover:bg-white border border-white disabled:opacity-40 text-xs font-bold text-zinc-950 flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                    >
+                      {publishingAgent ? (
+                        <span
+                          className="ordaris-fancy-spinner ordaris-fancy-spinner-sm"
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Lock className="w-3.5 h-3.5 shrink-0" />
+                      )}
+                      <span>
+                        {publishingAgent ? 'Publishing...' : 'Publish vN+1'}
+                      </span>
+                    </button>
+                  {selectedAgent && activePersona.role !== 'viewer' && (
+                    <button
+                      type="button"
+                      onClick={() => setShowDraftEditor((open) => !open)}
+                      className="h-8 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-xs font-medium text-zinc-200"
+                      aria-expanded={showDraftEditor}
+                    >
+                      {showDraftEditor ? 'Close editor' : 'Edit instructions'}
+                    </button>
+                  )}
+                </div>
+                </div>
+
+                <div className="ordaris-agent-selector px-4 sm:px-5 py-3">
+                  <label htmlFor="active-agent-select" className="ordaris-field-label">Active agent</label>
+                  <select
+                    id="active-agent-select"
+                    aria-label="Select Active Agent"
+                    disabled={agents.length === 0}
+                    value={selectedAgentId}
+                    onChange={(e) => {
+                      clearInspectedRun();
+                      setSelectedAgentId(e.target.value);
+                    }}
+                    className="w-full h-10 bg-[#09090B] border border-zinc-800 hover:border-zinc-700 rounded-lg px-3 text-xs sm:text-sm font-semibold text-white cursor-pointer transition-colors"
+                  >
+                    {agents.length === 0 && <option value="">No agents available</option>}
+                    {agents.map((ag) => (
+                      <option key={ag.id} value={ag.id}>
+                        {ag.name} ({ag.slug}) —{' '}
+                        {(ag.latestVersionNumber ?? 0) > 0
+                          ? `Snapshot v${ag.latestVersionNumber}`
+                          : 'Draft (Auto-pins v1 on Run)'}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {selectedAgent && (
                   <div className="p-4 sm:p-5 space-y-3.5 text-xs bg-[#09090B]/60">
-                    {/* Highlighted Snapshot & ToolGateway Bar */}
-                    <div className="flex flex-wrap items-center justify-between gap-2">
-                      <div className="flex flex-wrap items-center gap-2 font-mono text-[11px]">
-                        <span className="px-2.5 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-zinc-300">
-                          Pinned Versions:{' '}
-                          <strong className="text-white tabular-nums">
-                            {selectedAgentVersions.length ||
-                              selectedAgent.latestVersionNumber ||
-                              0}
-                          </strong>
-                        </span>
-                        <span className="px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/25 text-emerald-300">
-                          Allowlist:{' '}
-                          <strong>
-                            {(selectedAgent.draftToolAllowlist || []).length > 0
-                              ? (selectedAgent.draftToolAllowlist || []).join(', ')
-                              : 'none'}
-                          </strong>
-                        </span>
-                      </div>
-                      <span className="text-[11px] font-mono text-zinc-400">
+                    <div className="ordaris-agent-meta">
+                      <span>{selectedAgentVersions.length || selectedAgent.latestVersionNumber || 0} published versions</span>
+                      <span className={draftPromptChanged ? 'text-amber-300' : 'text-zinc-400'}>
                         {updatingAllowlist
                           ? 'Saving & pinning vN+1...'
                           : draftPromptChanged
@@ -2528,11 +2525,12 @@ export function App() {
                     </div>
 
                     {/* Interactive Server-Side ToolGateway Allowlist Segmented Controls */}
-                    <div className="p-3 rounded-lg bg-[#16161A] border border-zinc-800 flex flex-wrap items-center justify-between gap-2">
-                      <span className="text-xs font-mono font-semibold text-zinc-300">
-                        ToolGateway Allowlist:
-                      </span>
-                      <div className="flex flex-wrap items-center gap-2">
+                    <div className="ordaris-tool-list">
+                      <div className="ordaris-tool-list-heading">
+                        <span>Allowed tools</span>
+                        <span>Tools this agent can call</span>
+                      </div>
+                      <div className="ordaris-tool-controls" role="group" aria-label="Allowed tools">
                         {(
                           [
                             {
@@ -2558,17 +2556,21 @@ export function App() {
                                 activePersona.role === 'viewer' ||
                                 updatingAllowlist
                               }
+                              aria-pressed={enabled}
                               onClick={() => handleToggleAgentTool(tool.id)}
-                              className={`h-7 px-2.5 rounded-md border text-xs font-mono flex items-center gap-1.5 transition disabled:opacity-40 ${
+                              className={`ordaris-tool-toggle ${enabled ? 'is-enabled' : ''} ${
                                 enabled
-                                  ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/25'
-                                  : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200'
+                                  ? 'text-emerald-300'
+                                  : 'text-zinc-400'
                               }`}
                               title={tool.desc}
                             >
-                              <span className="font-semibold">{tool.label}</span>
-                              <span className="text-[10px] opacity-80">
-                                {enabled ? 'ON' : 'OFF'}
+                              <span className="ordaris-tool-label">
+                                <strong>{tool.label}</strong>
+                                <small>{tool.desc}</small>
+                              </span>
+                              <span className="ordaris-tool-state">
+                                {enabled ? 'Enabled' : 'Disabled'}
                               </span>
                             </button>
                           );
@@ -2618,15 +2620,13 @@ export function App() {
               </div>
 
               {/* Execution Composer + 2-Engine Arena Toggle + Pre-Flight Estimator */}
-              <div className="bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-4 shadow-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 text-[11px] font-mono font-bold uppercase">
-                      Bounded Runtime
-                    </span>
-                    <span className="px-2 py-1 rounded-md bg-zinc-900 border border-zinc-800 text-[11px] font-mono text-zinc-300">
-                      Max 5 Steps
-                    </span>
+              <div className="ordaris-run-composer bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-4">
+                <div className="ordaris-run-header">
+                  <div>
+                    <h3>Run this agent</h3>
+                    <p>{latestPublishedSnapshot
+                      ? `Tests snapshot v${latestPublishedSnapshot.versionNumber} with this workspace’s permissions.`
+                      : 'First run pins the current draft as snapshot v1.'}</p>
                   </div>
                   <button
                     type="button"
@@ -2641,11 +2641,6 @@ export function App() {
                     <span>2-Engine Arena: {arenaMode ? 'ON' : 'OFF'}</span>
                   </button>
                 </div>
-
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  Test this agent
-                </h3>
-                <p className="-mt-2 text-xs text-zinc-400">Runs use the selected immutable snapshot and the current tenant permissions.</p>
 
                 {arenaMode && (
                   <div className="grid grid-cols-2 gap-3 p-3.5 rounded-lg bg-[#16161A] border border-zinc-700">
@@ -2738,8 +2733,9 @@ export function App() {
                   </div>
                 )}
 
-                {/* Quick Domain & Red-Team Presets */}
-                <div className="grid grid-cols-2 gap-2">
+                <details className="ordaris-disclosure">
+                  <summary>Example prompts <span>4 examples</span></summary>
+                  <div className="ordaris-presets-grid">
                   <button
                     type="button"
                     onClick={() =>
@@ -2786,9 +2782,10 @@ export function App() {
                   >
                     Preset 4: FinOps Budget Cap (422)
                   </button>
-                </div>
+                  </div>
+                </details>
 
-                <label htmlFor="studio-run-prompt" className="sr-only">Prompt to run</label>
+                <label htmlFor="studio-run-prompt" className="ordaris-field-label">Prompt</label>
                 <textarea
                   id="studio-run-prompt"
                   rows={3}
@@ -2803,46 +2800,11 @@ export function App() {
                   </p>
                 )}
 
-                {/* Idempotency Key Input */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={idempotencyKeyInput}
-                    onChange={(e) => setIdempotencyKeyInput(e.target.value)}
-                    placeholder="Optional idempotencyKey (e.g. idem-incident-001) to test duplicate-run prevention"
-                    className="flex-1 h-9 bg-[#09090B] border border-zinc-800 rounded-lg px-3 text-xs font-mono text-zinc-200"
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setIdempotencyKeyInput(
-                        `idem_${activePersona.id}_${Date.now().toString(36).slice(-4)}`
-                      )
-                    }
-                    className="h-9 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-mono text-zinc-300 whitespace-nowrap"
-                  >
-                    Gen Key
-                  </button>
-                </div>
-
-                {/* Pre-Flight Token & Cost Estimator */}
-                <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs font-mono text-zinc-300 tabular-nums">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                      Prompt estimate: <strong className="text-white">~{estimatedPromptTokens} tokens</strong>
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800">
-                      Cost estimate: <strong className="text-blue-300">${estimatedCostUsd}</strong>
-                    </span>
-                  </div>
-                  <span className="text-[10px] text-zinc-500">Prompt-length heuristic · provider usage is recorded after the run</span>
-                </div>
-
                 <button
                   type="button"
                   disabled={runningStudio || !selectedAgentId || !promptInput.trim()}
                   onClick={handleExecuteStudioRun}
-                  className="w-full h-10 px-4 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-60 text-zinc-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition shadow-md shadow-white/5"
+                  className="ordaris-primary-action w-full h-10 px-4 rounded-lg bg-white hover:bg-zinc-200 disabled:opacity-60 text-zinc-950 text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition"
                 >
                   {runningStudio ? (
                     <span
@@ -2860,12 +2822,49 @@ export function App() {
                         : 'Run agent'}
                   </span>
                 </button>
+
+                <div className="ordaris-preflight" aria-live="polite">
+                  <span>Estimate</span>
+                  <strong>~{estimatedPromptTokens} tokens</strong>
+                  <span aria-hidden="true">·</span>
+                  <strong>${estimatedCostUsd}</strong>
+                  <span className="ordaris-preflight-note">Prompt-length estimate</span>
+                </div>
+
+                <details className="ordaris-disclosure">
+                  <summary>Advanced run options <span>Idempotency</span></summary>
+                  <div className="ordaris-advanced-field">
+                    <label htmlFor="idempotency-key" className="ordaris-field-label">Idempotency key <span>Optional · prevents duplicate runs</span></label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        id="idempotency-key"
+                        type="text"
+                        value={idempotencyKeyInput}
+                        onChange={(e) => setIdempotencyKeyInput(e.target.value)}
+                        placeholder="e.g. incident-2026-001"
+                        className="flex-1 h-9 bg-[#09090B] border border-zinc-800 rounded-lg px-3 text-xs font-mono text-zinc-200"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setIdempotencyKeyInput(
+                            `idem_${activePersona.id}_${Date.now().toString(36).slice(-4)}`
+                          )
+                        }
+                        className="h-9 px-3 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-mono text-zinc-300 whitespace-nowrap"
+                      >
+                        Generate
+                      </button>
+                    </div>
+                  </div>
+                </details>
+
               </div>
             </div>
 
             {/* RUN RESULT AND CONTEXT */}
-            <div className="lg:col-span-5 space-y-4">
-              <aside className="bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-3" aria-label="Current run context">
+            <div className="ordaris-run-context-stack lg:col-span-5 space-y-4">
+              <aside className="ordaris-run-context-card bg-[#111113] border border-zinc-800 rounded-xl p-4 sm:p-5 space-y-3" aria-label="Current run context">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-xs font-semibold text-white">Run context</h2>
                   <span className="text-[10px] font-mono text-blue-300">{selectedEngine}</span>
@@ -2875,13 +2874,13 @@ export function App() {
                   <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Persona</dt><dd className="mt-0.5 text-zinc-200">{activePersona.role}</dd></div>
                   <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Snapshot</dt><dd className="mt-0.5 text-zinc-200">{latestPublishedSnapshot ? `v${latestPublishedSnapshot.versionNumber}` : 'Will pin v1 on run'}</dd></div>
                   <div><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Provider</dt><dd className="mt-0.5 text-blue-300">{providerResolutionLabel}</dd></div>
-                  <div className="col-span-2"><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Tool allowlist</dt><dd className="mt-1 flex flex-wrap gap-1.5">{(selectedAgent?.draftToolAllowlist ?? []).length ? selectedAgent!.draftToolAllowlist.map((tool) => <code key={tool} className="rounded bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-200">{tool}</code>) : <span className="text-zinc-400">No tools enabled</span>}</dd></div>
+                  <div className="col-span-2"><dt className="text-[10px] uppercase tracking-wider text-zinc-500">Run tool allowlist</dt><dd className="mt-1 flex flex-wrap gap-1.5">{(latestPublishedSnapshot?.toolAllowlist ?? selectedAgent?.draftToolAllowlist ?? []).length ? (latestPublishedSnapshot?.toolAllowlist ?? selectedAgent?.draftToolAllowlist ?? []).map((tool) => <code key={tool} className="rounded bg-zinc-900 border border-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-200">{tool}</code>) : <span className="text-zinc-400">No tools enabled</span>}</dd></div>
                 </dl>
                 {draftPromptChanged && <p className="border-t border-zinc-800 pt-2 text-[11px] text-amber-300">Draft differs from the published snapshot. Publish to include those instructions in the next run.</p>}
               </aside>
               {/* Side-by-Side 2-Engine Arena Results (When Active) */}
               {arenaComparisonResult && (
-                <div className="bg-[#111113] border border-zinc-700 rounded-xl p-5 space-y-4">
+                <div className="ordaris-arena-result bg-[#111113] border border-zinc-700 rounded-xl p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
                       <Columns className="w-4 h-4 text-zinc-200" />
@@ -2934,7 +2933,7 @@ export function App() {
               )}
 
               {/* Run History + Single-Elevation Hairline Execution Trace & SSE Inspector */}
-              <div className="bg-[#111113] border border-zinc-800 rounded-xl divide-y divide-zinc-800 overflow-hidden">
+              <div className="ordaris-run-result-card bg-[#111113] border border-zinc-800 rounded-xl divide-y divide-zinc-800 overflow-hidden">
                 {/* 1. Top Inspector Header Bar */}
                 <div className="p-4 sm:p-5 flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
                   <div className="min-w-0">
@@ -3262,17 +3261,6 @@ export function App() {
                                       ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
                                       : 'bg-zinc-800 text-zinc-100 border-zinc-600';
 
-                            const leftAccentClass =
-                              st.status === 'failed'
-                                ? 'border-l-rose-500'
-                                : isCalculator
-                                  ? 'border-l-emerald-500'
-                                  : isKnowledgeSearch
-                                    ? 'border-l-cyan-500'
-                                    : isFinalAnswer
-                                      ? 'border-l-amber-400'
-                                      : 'border-l-zinc-200';
-
                             const stepTypeLabel = isModelTurn
                               ? 'PLANNER • MODEL TURN'
                               : isCalculator
@@ -3293,7 +3281,7 @@ export function App() {
                             return (
                               <div
                                 key={st.id}
-                                className={`rounded-xl bg-[#16161A] border border-zinc-800 border-l-4 ${leftAccentClass} p-4 sm:p-5 space-y-3.5 shadow-sm`}
+                                className="rounded-xl bg-[#16161A] border border-zinc-800 p-4 sm:p-5 space-y-3.5 shadow-sm"
                               >
                                 {/* Row 1: Highlighted Step Identity Boxes (Left) + Telemetry & JSON Toggle (Right) */}
                                 <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-zinc-800">
@@ -3715,12 +3703,12 @@ export function App() {
                           return (
                             <div
                               key={ev.id || ev.sequenceNumber}
-                              className={`p-3 rounded-xl text-xs border border-l-4 transition-all space-y-1.5 ${
+                              className={`p-3 rounded-xl text-xs border border-zinc-800 transition-all space-y-1.5 ${
                                 isSkipped
-                                  ? 'bg-[#09090B]/50 text-zinc-500 border-zinc-800/60 border-l-zinc-700 opacity-55'
+                                  ? 'bg-[#09090B]/50 text-zinc-500 border-zinc-800/60 opacity-55'
                                   : isReplayed
-                                    ? 'bg-[#16161A] text-zinc-200 border-emerald-500/35 border-l-emerald-500'
-                                    : 'bg-[#16161A] text-zinc-300 border-zinc-800 border-l-zinc-300'
+                                    ? 'bg-[#16161A] text-zinc-200'
+                                    : 'bg-[#16161A] text-zinc-300'
                               }`}
                             >
                               <div className="flex items-center justify-between gap-2">
@@ -3894,7 +3882,7 @@ export function App() {
       </div>
 
       {/* FOOTER DATABASE & SESSION DIAGNOSTICS BAR */}
-      <footer className="border-t border-zinc-800 bg-[#09090B] px-5 lg:px-8 py-4 mt-auto">
+      <footer className="ordaris-system-footer border-t border-zinc-800 bg-[#09090B] px-5 lg:px-8 py-4 mt-auto">
         <div className="max-w-[1640px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-400 font-mono">
           <div className="flex flex-wrap items-center gap-3">
             <span className="text-white font-bold">
